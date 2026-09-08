@@ -189,7 +189,7 @@ export default function Index({ areas }) {
             )}
 
             <Modal
-                open={modalOpen}
+                show={modalOpen}
                 onClose={() => setModalOpen(false)}
                 title={editingArea ? "Edit Area" : "Tambah Area"}
             >
