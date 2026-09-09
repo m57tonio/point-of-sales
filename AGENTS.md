@@ -18,8 +18,9 @@ Open-source POS system (200+ stars). Laravel 13 + Inertia 3.0 + React 19.
 
 ## Stack
 
-- **Backend**: Laravel 13 (PHP 8.3+)
+- **Backend**: Laravel 13 (composer.json requires PHP ^8.3; CI tests on PHP 8.4)
 - **Frontend**: Inertia.js 3.0 + React 19, Vite 5
+- **CI**: `.github/workflows/deploy.yml` uses PHP 8.4 + Node 22 for build, Node 24.15 on deploy VPS
 - **Styling**: Tailwind CSS 3 (custom theme in `tailwind.config.js`)
 - **Auth/RBAC**: Spatie Laravel Permission + Laravel Breeze
 - **REST API**: Sanctum token-based at `/api/v1`; Scramble docs at `/docs/api`, spec at `/docs/api.json`; protect with `SCRAMBLE_DOCS_TOKEN`
@@ -60,6 +61,8 @@ php artisan inventory:reconcile --fix     # align global stock to pivot sum
 php artisan reorder:generate              # generate draft PO from low-stock products (daily 02:00)
 php artisan crm:sync-segments             # refresh auto segment memberships (daily 01:00)
 php artisan crm:generate-reminders       # queue campaign reminder messages (daily 01:15)
+php artisan scramble:cache               # warm Scramble OpenAPI cache
+php artisan scramble:clear               # invalidate Scramble OpenAPI cache
 
 # Formatting
 vendor/bin/pint
@@ -111,7 +114,7 @@ After seeding, a default `PUSAT` warehouse is created and existing product stock
 3. **Product images need storage:link** — `php artisan storage:link` or images won't render.
 4. **Missing migrations cause 500 on new modules** — run `php artisan migrate` for newer modules (purchase orders, goods receiving, supplier returns, stock opname, dine-in, etc.).
 5. **Tests force SQLite in-memory** — `phpunit.xml` sets `DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:`. Don't assume MySQL features. **Set `tax_rate=0` on test Product::create** to avoid PPN changing grand_total.
-6. **Both dev servers required** — Vite serves JS/CSS via HMR. `php artisan serve` alone won't work.
+6. **Both dev servers required** — `npm run dev` (Vite HMR) + `php artisan serve` in separate terminals.
 7. **WhatsApp service separate** — `whatsapp-service/` needs `npm start` in another terminal + `WA_SERVICE_URL` in .env.
 8. **CRM campaign auto-send** — requires `wa_enabled=true` + connected device in Settings > WhatsApp.
 9. **Version bump on release** — update `APP_VERSION` in `.env` + `.env.example` when tagging.
