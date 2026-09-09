@@ -33,3 +33,4 @@ planning/
 # Bun lockfiles (repo uses npm / package-lock.json)
 bun.lock
 whatsapp-service/bun.lock
+/storage/pail

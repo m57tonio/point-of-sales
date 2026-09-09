@@ -39,9 +39,8 @@ php artisan key:generate
 php artisan migrate --seed
 php artisan storage:link
 
-# Dev servers — run BOTH
-npm run dev          # Vite HMR
-php artisan serve    # Laravel
+# Dev — runs server, queue, logs (pail), and vite in one command
+composer run dev     # equivalent to `php artisan dev` (Laravel 13 DevCommand)
 
 # Testing
 php artisan test                     # all
@@ -91,17 +90,19 @@ npm run build
 | `registration.enabled` | EnsurePublicRegistrationEnabled | Register route (default: off) |
 | `abilities` | CheckAbilities (Sanctum) | API master-data resources only; `/pos/*` and `/auth/*` are auth-only |
 
-## Seeder Chain
+## Seeder Chain & First-Install Setup
 
-`DatabaseSeeder` runs in exact order with permission cache reset before & after:
+`DatabaseSeeder` runs only system-essential seeders with permission cache reset before & after:
 
 ```
-PermissionSeeder → RoleSeeder → UserSeeder → PaymentSettingSeeder → SampleDataSeeder → OperationalCoreSeeder → FeatureCoverageSeeder → DineInSettingsSeeder
+PermissionSeeder → RoleSeeder → PaymentSettingSeeder → DineInSettingsSeeder
 ```
 
 After seeding, a default `PUSAT` warehouse is created and existing product stock is migrated to the `product_warehouse` pivot.
 
-**Default users:** `arya@gmail.com` / `password` (super-admin), `cashier@gmail.com` / `password` (cashier)
+**No default users.** Admin account, store profile, business type, categories, and main warehouse are created via the first-install setup wizard at `/setup` (gated by `setup.notinstalled` middleware checking `Setting::app_setup_completed`; redirects to login once done).
+
+**Demo seeders are opt-in, not part of `DatabaseSeeder`:** `php artisan db:seed --class=SampleDataSeeder` (needs UserSeeder first: `--class=UserSeeder`), plus `OperationalCoreSeeder`, `FeatureCoverageSeeder`, `FeatureDemoSeeder` for full demo data.
 
 ## Inventory Model
 
@@ -114,7 +115,7 @@ After seeding, a default `PUSAT` warehouse is created and existing product stock
 3. **Product images need storage:link** — `php artisan storage:link` or images won't render.
 4. **Missing migrations cause 500 on new modules** — run `php artisan migrate` for newer modules (purchase orders, goods receiving, supplier returns, stock opname, dine-in, etc.).
 5. **Tests force SQLite in-memory** — `phpunit.xml` sets `DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:`. Don't assume MySQL features. **Set `tax_rate=0` on test Product::create** to avoid PPN changing grand_total.
-6. **Both dev servers required** — `npm run dev` (Vite HMR) + `php artisan serve` in separate terminals.
+6. **Dev servers unified** — `composer run dev` starts server + queue + pail + vite together (`php artisan dev`). WA service stays separate.
 7. **WhatsApp service separate** — `whatsapp-service/` needs `npm start` in another terminal + `WA_SERVICE_URL` in .env.
 8. **CRM campaign auto-send** — requires `wa_enabled=true` + connected device in Settings > WhatsApp.
 9. **Version bump on release** — update `APP_VERSION` in `.env` + `.env.example` when tagging.
