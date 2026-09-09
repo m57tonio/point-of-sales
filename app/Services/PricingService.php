@@ -95,7 +95,7 @@ class PricingService
                 PricingRule::KIND_STANDARD_DISCOUNT,
                 PricingRule::KIND_QTY_BREAK,
             ], true))
-            ->map(function (PricingRule $rule) use ($product, $quantity) {
+            ->map(function (PricingRule $rule) use ($product, $quantity, $customer) {
                 $previewQuantity = $rule->kind === PricingRule::KIND_QTY_BREAK
                     ? max($quantity, (int) ($rule->preview_quantity_multiplier ?: $rule->qtyBreaks->max('min_qty') ?: 1))
                     : $quantity;

@@ -105,6 +105,12 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
+            // Custom error page only when APP_DEBUG=false; debug mode keeps Laravel's
+            // default error screen so the real message/trace stays visible.
+            if (config('app.debug')) {
+                return null;
+            }
+
             return Inertia::render('Error', [
                 'status' => $status,
                 'homeUrl' => $request->user() ? route('dashboard') : url('/'),

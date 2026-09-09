@@ -412,7 +412,7 @@ export default function Index({ tables, areas, filters }) {
             )}
 
             <Modal
-                open={modalOpen}
+                show={modalOpen}
                 onClose={() => setModalOpen(false)}
                 title={editingTable ? `Edit Meja: ${editingTable.name}` : "Tambah Meja"}
             >
