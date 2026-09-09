@@ -10,12 +10,25 @@ return new class extends Migration
     {
         Schema::create('transaction_detail_batch_allocations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('transaction_detail_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('product_batch_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('transaction_detail_id');
+            $table->foreignId('product_batch_id');
             $table->integer('qty');
             $table->timestamps();
 
-            $table->unique(['transaction_detail_id', 'product_batch_id']);
+            $table->foreign('transaction_detail_id', 'tdba_detail_fk')
+                ->references('id')
+                ->on('transaction_details')
+                ->cascadeOnDelete();
+
+            $table->foreign('product_batch_id', 'tdba_batch_fk')
+                ->references('id')
+                ->on('product_batches')
+                ->cascadeOnDelete();
+
+            $table->unique(
+                ['transaction_detail_id', 'product_batch_id'],
+                'tdba_detail_batch_unique'
+            );
         });
     }
 

@@ -27,9 +27,12 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('carts', function (Blueprint $table) {
+            // The composite index backs the cashier_id FK, so drop the FK first.
+            $table->dropForeign(['cashier_id']);
             $table->dropIndex(['cashier_id', 'hold_id']);
             $table->dropIndex(['hold_id']);
             $table->dropColumn(['hold_id', 'hold_label', 'held_at']);
+            $table->foreign('cashier_id')->references('id')->on('users');
         });
     }
 };
