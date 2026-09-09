@@ -238,7 +238,7 @@ export default function Index({ products }) {
             <Head title="Produk" />
 
             {/* Header */}
-            <div className="mb-6">
+            <div data-tour="products-header" className="mb-6">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
@@ -248,7 +248,10 @@ export default function Index({ products }) {
                             {products.total} produk terdaftar
                         </p>
                     </div>
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                    <div
+                        data-tour="products-actions"
+                        className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto"
+                    >
                         <button
                             onClick={handlePrintAllBarcodes}
                             className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors w-full sm:w-auto"
@@ -306,7 +309,10 @@ export default function Index({ products }) {
             </div>
 
             {/* Toolbar */}
-            <div className="mb-4 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
+            <div
+                data-tour="products-search"
+                className="mb-4 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3"
+            >
                 <div className="flex items-center gap-3">
                     <div className="w-full sm:w-80">
                         <Search
@@ -331,7 +337,7 @@ export default function Index({ products }) {
                         </span>
                     </label>
                 </div>
-                <div className="flex items-center gap-2">
+                <div data-tour="products-view" className="flex items-center gap-2">
                     {/* Show selection count and print selected button */}
                     {selectedProducts.length > 0 && (
                         <button
@@ -368,6 +374,7 @@ export default function Index({ products }) {
             </div>
 
             {/* Content */}
+            <div data-tour="products-list" className="contents">
             {products.data.length > 0 ? (
                 viewMode === "grid" ? (
                     /* Grid View */
@@ -548,6 +555,7 @@ export default function Index({ products }) {
                     )}
                 </div>
             )}
+            </div>
 
             {products.last_page !== 1 && <Pagination links={products.links} />}
 

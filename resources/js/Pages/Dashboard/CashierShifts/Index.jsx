@@ -85,7 +85,10 @@ export default function Index({
             <Head title="Shift Kasir" />
 
             <div className="space-y-6">
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div
+                    data-tour="shifts-header"
+                    className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+                >
                     <div>
                         <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white">
                             <IconHistory size={28} className="text-primary-500" />
@@ -107,7 +110,10 @@ export default function Index({
                 </div>
 
                 {!activeShift && canOpenShift && (
-                    <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+                    <div
+                        data-tour="shifts-open"
+                        className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900"
+                    >
                         <div className="mb-4">
                             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
                                 Buka Shift Baru
@@ -176,7 +182,7 @@ export default function Index({
                 )}
 
                 {activeShift && (
-                    <div className="grid gap-4 md:grid-cols-4">
+                    <div data-tour="shifts-active" className="grid gap-4 md:grid-cols-4">
                         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900/50 dark:bg-emerald-950/30">
                             <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
                                 Shift Aktif
@@ -220,7 +226,10 @@ export default function Index({
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 gap-3 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 md:grid-cols-4">
+                <div
+                    data-tour="shifts-filters"
+                    className="grid grid-cols-1 gap-3 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 md:grid-cols-4"
+                >
                     {cashiers.length > 1 ? (
                         <select
                             value={currentFilters.cashier_id}
@@ -264,7 +273,8 @@ export default function Index({
                     />
                 </div>
 
-                <Table.Card title="Histori Shift Kasir">
+                <div data-tour="shifts-history">
+                    <Table.Card title="Histori Shift Kasir">
                     <Table>
                         <Table.Thead>
                             <tr>
@@ -343,6 +353,7 @@ export default function Index({
                         </Table.Tbody>
                     </Table>
                 </Table.Card>
+                </div>
 
                 {shifts.last_page > 1 && <Pagination links={shifts.links} />}
             </div>

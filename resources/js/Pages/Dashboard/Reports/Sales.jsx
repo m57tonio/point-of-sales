@@ -207,7 +207,10 @@ const Sales = ({ transactions, summary, filters, cashiers, customers, warehouses
 
             <div className="space-y-6">
                 {/* Header */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div
+                    data-tour="reports-header"
+                    className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+                >
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                             <IconTrendingUp
@@ -237,7 +240,7 @@ const Sales = ({ transactions, summary, filters, cashiers, customers, warehouses
                 </div>
 
                 {/* Summary Cards */}
-                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div data-tour="reports-summary" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                     {summaryCards.map((card) => (
                         <SummaryCard key={card.title} {...card} />
                     ))}
@@ -245,7 +248,10 @@ const Sales = ({ transactions, summary, filters, cashiers, customers, warehouses
 
                 {/* Filters Panel */}
                 {showFilters && (
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 animate-slide-up">
+                    <div
+                        data-tour="reports-filters"
+                        className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 animate-slide-up"
+                    >
                         <form onSubmit={applyFilters}>
                             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
                                 <div>
@@ -338,7 +344,10 @@ const Sales = ({ transactions, summary, filters, cashiers, customers, warehouses
 
                 {/* Table */}
                 {rows.length > 0 ? (
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <div
+                        data-tour="reports-table"
+                        className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden"
+                    >
                         <div className="overflow-x-auto">
                             <table className="w-full">
                                 <thead>

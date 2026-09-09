@@ -348,7 +348,10 @@ export default function Insights({
             <Head title="Advanced Sales Insights" />
 
             <div className="space-y-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div
+                    data-tour="reports-header"
+                    className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+                >
                     <div>
                         <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white">
                             <IconChartBar
@@ -375,7 +378,7 @@ export default function Insights({
                     </button>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div data-tour="reports-summary" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                     <SummaryCard
                         title="Pendapatan"
                         value={formatCurrency(summary?.revenue_total ?? 0)}
@@ -407,7 +410,10 @@ export default function Insights({
                 </div>
 
                 {showFilters && (
-                    <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+                    <div
+                        data-tour="reports-filters"
+                        className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900"
+                    >
                         <form onSubmit={applyFilters}>
                             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
                                 <div>
@@ -492,7 +498,7 @@ export default function Insights({
                     </div>
                 )}
 
-                <div className="grid gap-6 xl:grid-cols-2">
+                <div data-tour="reports-table" className="grid gap-6 xl:grid-cols-2">
                     <ChartCard
                         title="Sales by Hour"
                         subtitle="Pola omzet per jam dari transaksi yang lolos filter."
