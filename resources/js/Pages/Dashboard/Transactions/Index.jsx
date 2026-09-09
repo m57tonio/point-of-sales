@@ -686,6 +686,7 @@ export default function Index({
 
                 {/* Left Panel - Products */}
                 <div
+                    data-tour="pos-products"
                     className={`flex-1 bg-slate-100 dark:bg-slate-950 overflow-hidden ${
                         mobileView !== "products"
                             ? "hidden lg:flex lg:flex-col"
@@ -718,7 +719,10 @@ export default function Index({
                     style={{ height: "calc(100vh - 4rem)" }}
                 >
                     {/* Customer Select - Fixed */}
-                    <div className="p-3 border-b border-slate-200 dark:border-slate-800 flex-shrink-0">
+                    <div
+                        data-tour="pos-customer"
+                        className="p-3 border-b border-slate-200 dark:border-slate-800 flex-shrink-0"
+                    >
                         <CustomerSelect
                             customers={customers}
                             selected={selectedCustomer}
@@ -741,7 +745,7 @@ export default function Index({
                     )}
 
                     {/* Cart Items - Scrollable */}
-                    <div className="flex-1 overflow-y-auto min-h-0">
+                    <div data-tour="pos-cart" className="flex-1 overflow-y-auto min-h-0">
                         {/* Hold Button - at top of cart section */}
                         {carts.length > 0 && (
                             <div className="p-3 border-b border-slate-200 dark:border-slate-800">
@@ -912,7 +916,7 @@ export default function Index({
                         </div>
 
                         {/* Payment Details - Scrollable */}
-                        <div className="p-3 space-y-4">
+                        <div data-tour="pos-payment" className="p-3 space-y-4">
                             {/* Pay later toggle */}
                             <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
                                 <div>

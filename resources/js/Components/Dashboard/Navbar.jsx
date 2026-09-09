@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { usePage } from "@inertiajs/react";
-import { IconMenu2, IconMoon, IconSun, IconSearch } from "@tabler/icons-react";
+import {
+    IconMenu2,
+    IconMoon,
+    IconSun,
+    IconSearch,
+    IconQuestionMark,
+} from "@tabler/icons-react";
 import AuthDropdown from "@/Components/Dashboard/AuthDropdown";
 import LanguageSwitcher from "@/Components/Dashboard/LanguageSwitcher";
 import Menu from "@/Utils/Menu";
 import Notification from "@/Components/Dashboard/Notification";
+import { useTour } from "@/Hooks/useTour";
+import i18n from "@/i18n";
 
 export default function Navbar({ toggleSidebar, themeSwitcher, darkMode }) {
     const { auth, storeProfile } = usePage().props;
+    const { start: startTour, isActive: tourActive } = useTour("dashboard");
     const menuNavigation = Menu();
 
     const storeName = storeProfile?.name || "KASIR";
@@ -79,6 +88,16 @@ export default function Navbar({ toggleSidebar, themeSwitcher, darkMode }) {
 
             {/* Right Section */}
             <div className="flex items-center gap-2">
+                {/* Tour Guide */}
+                <button
+                    onClick={startTour}
+                    disabled={tourActive}
+                    className="p-2.5 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+                    title={i18n.t("tour.button")}
+                >
+                    <IconQuestionMark size={20} strokeWidth={1.5} />
+                </button>
+
                 {/* Language Switcher */}
                 <LanguageSwitcher />
 

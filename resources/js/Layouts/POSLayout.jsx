@@ -15,12 +15,16 @@ import {
     IconWallet,
     IconArrowsMaximize,
     IconArrowsMinimize,
+    IconQuestionMark,
 } from "@tabler/icons-react";
 import Notification from "@/Components/Dashboard/Notification";
+import { useTour } from "@/Hooks/useTour";
+import i18n from "@/i18n";
 
 export default function POSLayout({ children }) {
     const { auth, storeProfile, activeCashierShift, appVersion } = usePage().props;
     const { darkMode, themeSwitcher } = useTheme();
+    const { start: startTour, isActive: tourActive } = useTour("pos");
     const [currentTime, setCurrentTime] = useState(new Date());
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
@@ -154,6 +158,16 @@ export default function POSLayout({ children }) {
                     <span className="hidden lg:block text-[11px] text-slate-400 dark:text-slate-600 font-mono">
                         {appVersion}
                     </span>
+
+                    {/* Tour Guide */}
+                    <button
+                        onClick={startTour}
+                        disabled={tourActive}
+                        className="p-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors min-w-touch min-h-touch flex items-center justify-center disabled:opacity-50"
+                        title={i18n.t("tour.button")}
+                    >
+                        <IconQuestionMark size={20} className="text-slate-500" />
+                    </button>
 
                     {/* Fullscreen Toggle */}
                     <button

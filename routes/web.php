@@ -48,6 +48,7 @@ use App\Http\Controllers\Reports\ProfitReportController;
 use App\Http\Controllers\Reports\SalesReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SetupController;
+use App\Http\Controllers\TourController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -91,6 +92,7 @@ Route::post('/portal/receivables/{receivable}/pay', [PublicPortalController::cla
 Route::post('/language/switch', [LanguageController::class, 'switch'])->name('language.switch');
 
 Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], function () {
+    Route::post('/tours/{tour}/complete', [TourController::class, 'complete'])->name('tours.complete');
     Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified', 'permission:dashboard-access'])->name('dashboard');
     Route::get('/permissions', [PermissionController::class, 'index'])->middleware('permission:permissions-access')->name('permissions.index');
     // roles route

@@ -188,6 +188,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
                 'permissions' => $request->user() ? $request->user()->getPermissions() : [],
                 'super' => $request->user() ? $request->user()->isSuperAdmin() : false,
+                'completedTours' => $request->user()?->completed_tours ?? [],
             ],
             'locale' => [
                 'current' => app()->getLocale(),

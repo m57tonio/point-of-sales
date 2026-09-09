@@ -838,5 +838,116 @@
         "current": "Bahasa Saat Ini",
         "indonesia": "Indonesia",
         "english": "English"
+    },
+    "tour": {
+        "button": "Panduan Penggunaan",
+        "dashboard": {
+            "title": "Halaman Dashboard",
+            "desc": "Ini adalah pusat ringkasan bisnis Anda. Mari kita jelajahi sekilas.",
+            "stats": {
+                "title": "Kartu Statistik",
+                "desc": "Penjualan, profit, target bulanan, dan jumlah transaksi hari ini."
+            },
+            "chart": {
+                "title": "Tren Pendapatan",
+                "desc": "Grafik pendapatan 12 periode terakhir."
+            },
+            "widgets": {
+                "title": "Widget Pemantauan",
+                "desc": "Shift kasir aktif, piutang, hutang, dan pesanan dine-in yang perlu perhatian."
+            },
+            "recent": {
+                "title": "Transaksi Terbaru",
+                "desc": "Lima transaksi terakhir yang masuk."
+            },
+            "lowstock": {
+                "title": "Stok Menipis",
+                "desc": "Produk dengan stok di bawah batas aman — segera lakukan pembelian ulang."
+            }
+        },
+        "pos": {
+            "search": {
+                "title": "Pencarian Produk",
+                "desc": "Cari produk by nama atau scan barcode langsung ke sini. Tekan / untuk fokus cepat."
+            },
+            "products": {
+                "title": "Daftar Produk",
+                "desc": "Klik produk untuk menambahkannya ke keranjang. Filter by kategori tersedia di atas."
+            },
+            "customer": {
+                "title": "Pilih Pelanggan",
+                "desc": "Opsional — pilih pelanggan untuk poin loyalitas, voucher, dan pencatatan piutang."
+            },
+            "cart": {
+                "title": "Keranjang",
+                "desc": "Atur jumlah item di sini. Gunakan tombol hold untuk menunda transaksi."
+            },
+            "payment": {
+                "title": "Pembayaran",
+                "desc": "Pilih metode pembayaran, atur nominal, lalu selesaikan transaksi."
+            }
+        },
+        "products": {
+            "header": {
+                "title": "Halaman Produk",
+                "desc": "Kelola semua produk toko Anda dari sini."
+            },
+            "actions": {
+                "title": "Aksi Produk",
+                "desc": "Cetak barcode massal, ekspor/impor produk, dan tambah produk baru."
+            },
+            "search": {
+                "title": "Pencarian",
+                "desc": "Cari produk by nama, SKU, atau barcode."
+            },
+            "view": {
+                "title": "Mode Tampilan",
+                "desc": "Ganti antara tampilan grid dan tabel sesuai kenyamanan."
+            },
+            "list": {
+                "title": "Daftar Produk",
+                "desc": "Klik produk untuk melihat detail, edit, atau kelola stok per gudang."
+            }
+        },
+        "shifts": {
+            "header": {
+                "title": "Shift Kasir",
+                "desc": "Shift aktif wajib dibuka sebelum kasir bisa memproses transaksi di POS."
+            },
+            "open": {
+                "title": "Buka Shift",
+                "desc": "Isi modal awal dan pilih gudang, lalu buka shift untuk mulai berjualan."
+            },
+            "active": {
+                "title": "Ringkasan Shift Aktif",
+                "desc": "Modal awal, expected cash, dan jumlah transaksi berjalan."
+            },
+            "filters": {
+                "title": "Filter Histori",
+                "desc": "Filter histori shift by kasir, status, dan rentang tanggal."
+            },
+            "history": {
+                "title": "Histori Shift",
+                "desc": "Review shift yang sudah ditutup, termasuk selisih kas saat closing."
+            }
+        },
+        "reports": {
+            "header": {
+                "title": "Halaman Laporan",
+                "desc": "Analisis performa bisnis berdasarkan periode dan filter."
+            },
+            "summary": {
+                "title": "Kartu Ringkasan",
+                "desc": "Metrik utama periode terpilih — pendapatan, profit, dan lainnya."
+            },
+            "filters": {
+                "title": "Filter Laporan",
+                "desc": "Persempit data by tanggal, invoice, kasir, atau pelanggan."
+            },
+            "table": {
+                "title": "Data Laporan",
+                "desc": "Detail per transaksi/breakdown. Navigasi halaman di bawah."
+            }
+        }
     }
 }

@@ -150,9 +150,12 @@ function InfoCard({ title, value, subtitle, icon: Icon }) {
 }
 
 // List Card Component
-function ListCard({ title, subtitle, icon: Icon, children, emptyMessage }) {
+function ListCard({ title, subtitle, icon: Icon, children, emptyMessage, ...rest }) {
     return (
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+        <div
+            {...rest}
+            className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden"
+        >
             <div className="p-5 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-2">
                     <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/30">
@@ -307,7 +310,10 @@ export default function Dashboard({
 
             <div className="space-y-6">
                 {/* Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div
+                    data-tour="dashboard-header"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+                >
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
                             Dashboard
@@ -326,7 +332,10 @@ export default function Dashboard({
                 </div>
 
                 {/* Main Stat Cards - Reorganized */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div
+                    data-tour="dashboard-stats"
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+                >
                     <StatCard
                         title="Penjualan Hari Ini"
                         value={formatCurrency(todaySales)}
@@ -383,6 +392,7 @@ export default function Dashboard({
 
                 {/* Revenue Chart - Full Width */}
                 <ListCard
+                    data-tour="dashboard-chart"
                     title="Tren Pendapatan"
                     subtitle="12 data terakhir"
                     icon={IconChartBar}
@@ -396,7 +406,10 @@ export default function Dashboard({
                 </ListCard>
 
                 {/* 4-Column Bottom Widgets */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div
+                    data-tour="dashboard-widgets"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                >
                     <ListCard
                         title="Shift Aktif"
                         subtitle="Pemantauan kasir"
@@ -568,6 +581,7 @@ export default function Dashboard({
 
                 {/* Recent Transactions */}
                 <ListCard
+                    data-tour="dashboard-recent"
                     title="Transaksi Terbaru"
                     subtitle="5 transaksi terakhir"
                     icon={IconReceipt}
@@ -599,6 +613,7 @@ export default function Dashboard({
 
                 {/* Low Stock Highlight */}
                 <ListCard
+                    data-tour="dashboard-lowstock"
                     title="Stok Menipis"
                     subtitle="Stok < 10"
                     icon={IconAlertTriangle}

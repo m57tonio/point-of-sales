@@ -259,7 +259,10 @@ export default function ProductGrid({
     return (
         <div className="h-full flex flex-col">
             {/* Search Bar */}
-            <div className="p-4 border-b border-slate-200 dark:border-slate-800">
+            <div
+                data-tour="pos-search"
+                className="p-4 border-b border-slate-200 dark:border-slate-800"
+            >
                 <SearchInput
                     value={searchQuery}
                     onChange={onSearchChange}
