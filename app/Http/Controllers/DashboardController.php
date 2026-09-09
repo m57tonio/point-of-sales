@@ -187,6 +187,13 @@ class DashboardController extends Controller
             'topCustomers' => $topCustomers,
             'topLocations' => $topLocations,
             'activeShifts' => $activeShifts,
+            'setupChecklist' => [
+                'store_profile' => (bool) Setting::get('app_setup_completed'),
+                'category' => Category::exists(),
+                'product' => Product::exists(),
+                'customer' => Customer::exists(),
+                'transaction' => Transaction::exists(),
+            ],
         ]);
     }
 }

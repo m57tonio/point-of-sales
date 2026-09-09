@@ -1,7 +1,9 @@
 import DashboardLayout from "@/Layouts/DashboardLayout";
 import { Head, Link } from "@inertiajs/react";
+import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useRef } from "react";
 import Chart from "chart.js/auto";
+import SetupChecklist from "@/Components/Dashboard/SetupChecklist";
 import {
     IconBox,
     IconCategory,
@@ -208,7 +210,9 @@ export default function Dashboard({
     topLocations = [],
     lowStockProducts = [],
     activeShifts = [],
+    setupChecklist = {},
 }) {
+    const { t } = useTranslation();
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
 
@@ -330,6 +334,9 @@ export default function Dashboard({
                         <span>Transaksi Baru</span>
                     </Link>
                 </div>
+
+                {/* Setup Checklist */}
+                <SetupChecklist checklist={setupChecklist} />
 
                 {/* Main Stat Cards - Reorganized */}
                 <div

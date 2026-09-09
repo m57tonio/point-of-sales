@@ -841,6 +841,7 @@
     },
     "tour": {
         "button": "Panduan Penggunaan",
+        "reset": "Putar Ulang Panduan",
         "dashboard": {
             "title": "Halaman Dashboard",
             "desc": "Ini adalah pusat ringkasan bisnis Anda. Mari kita jelajahi sekilas.",
@@ -948,6 +949,17 @@
                 "title": "Data Laporan",
                 "desc": "Detail per transaksi/breakdown. Navigasi halaman di bawah."
             }
+        }
+    },
+    "setupChecklist": {
+        "title": "Checklist Persiapan Toko",
+        "subtitle": ":done dari :total langkah selesai — lengkapi untuk mulai berjualan.",
+        "items": {
+            "store_profile": "Lengkapi profil toko",
+            "category": "Buat kategori pertama",
+            "product": "Tambahkan produk pertama",
+            "customer": "Daftarkan pelanggan pertama",
+            "transaction": "Selesaikan transaksi pertama"
         }
     }
 }
