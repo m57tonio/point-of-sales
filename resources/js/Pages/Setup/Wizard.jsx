@@ -3,7 +3,6 @@ import { Head, useForm } from "@inertiajs/react";
 import { useTranslation } from "react-i18next";
 import {
     IconShoppingCart,
-    IconStore,
     IconBuildingStore,
     IconTags,
     IconUserShield,
@@ -87,7 +86,7 @@ export default function Wizard({ businessTypes }) {
     );
 
     const stepIcons = [
-        IconStore,
+        IconBuildingStore,
         IconBuildingStore,
         IconTags,
         IconUserShield,
