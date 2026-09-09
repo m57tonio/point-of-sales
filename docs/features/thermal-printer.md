@@ -21,12 +21,11 @@ Cetak receipt ke printer thermal (ESC/POS protocol) langsung dari browser via We
 ### Printer Settings
 - Paper size: 80mm / 58mm
 - Auto-print toggle (cetak otomatis setelah transaksi)
-- WebUSB: koneksi printer thermal via USB langsung dari browser
 
-### WebUSB Print Button
-- Tombol "Thermal" di halaman print transaksi
-- Fetch HTML receipt → buka tab baru siap print
-- Dapat dikoneksikan ke printer thermal USB via WebUSB API
+## ⚠️ Belum Tersedia (rencana Phase 5, lihat Planning POS Core Gaps)
+
+- **ESC/POS raw printing via WebUSB** — belum diimplementasikan. Tombol "Thermal" saat ini hanya fetch HTML receipt dan membukanya di tab browser untuk `window.print()`, BUKAN kirim byte ESC/POS ke printer.
+- **Auto-print setelah checkout** — setting toggle ada, tapi belum terintegrasi dengan checkout flow (kasir masih harus klik manual ke halaman print).
 
 ## Route
 
@@ -65,6 +64,5 @@ Kembali              11.150
 
 ## Catatan
 
-- Untuk auto-print via USB: browser Chrome/Edge dengan WebUSB support
-- Untuk print via jaringan: gunakan `NetworkPrintConnector` atau `WindowsPrintConnector`
-- Setting auto-print belum terintegrasi penuh dengan checkout flow
+- Untuk print via jaringan: gunakan `NetworkPrintConnector` atau `WindowsPrintConnector` (belum ada di codebase)
+- ESC/POS WebUSB + auto-print: lihat planning "POS Core Gaps" Phase 5
