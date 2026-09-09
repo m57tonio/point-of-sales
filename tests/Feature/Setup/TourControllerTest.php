@@ -72,4 +72,22 @@ class TourControllerTest extends TestCase
         $this->postJson('/dashboard/tours/dashboard/complete')
             ->assertUnauthorized();
     }
+
+    public function test_user_can_reset_completed_tours(): void
+    {
+        $this->user->update(['completed_tours' => ['dashboard', 'pos']]);
+
+        $this->actingAs($this->user)
+            ->postJson('/dashboard/tours/reset')
+            ->assertOk()
+            ->assertJson(['completed' => []]);
+
+        $this->assertNull($this->user->fresh()->completed_tours);
+    }
+
+    public function test_reset_requires_auth(): void
+    {
+        $this->postJson('/dashboard/tours/reset')
+            ->assertUnauthorized();
+    }
 }

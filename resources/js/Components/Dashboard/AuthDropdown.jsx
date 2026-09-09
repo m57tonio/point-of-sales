@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import { usePage } from "@inertiajs/react";
-import { IconLogout } from "@tabler/icons-react";
+import { usePage, router } from "@inertiajs/react";
+import { IconLogout, IconRotate } from "@tabler/icons-react";
 import { useForm } from "@inertiajs/react";
 import MenuLink from "@/Utils/Menu";
 import LinkItem from "./LinkItem";
 import LinkItemDropdown from "./LinkItemDropdown";
+import i18n from "@/i18n";
 export default function AuthDropdown({ auth, isMobile }) {
     // define usefrom
     const { post } = useForm();
@@ -50,6 +51,15 @@ export default function AuthDropdown({ auth, isMobile }) {
         post(route("logout"));
     };
 
+    const resetTours = (e) => {
+        e.preventDefault();
+
+        router.post(route("tours.reset"), {}, {
+            preserveScroll: true,
+            onSuccess: () => router.reload({ only: ["auth"] }),
+        });
+    };
+
     const avatarUrl = auth.user.avatar;
     const userInitial =
         auth.user.name?.charAt(0)?.toUpperCase() ??
@@ -83,6 +93,18 @@ export default function AuthDropdown({ auth, isMobile }) {
                     >
                         <Menu.Items className="absolute rounded-lg w-48 border mt-2 py-2 right-0 z-[100] bg-white dark:bg-gray-950 dark:border-gray-900">
                             <div className="flex flex-col gap-1.5 divide-y divide-gray-100 dark:divide-gray-900">
+                                <Menu.Item>
+                                    <button
+                                        onClick={resetTours}
+                                        className="px-3 py-1.5 text-sm flex items-center gap-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+                                    >
+                                        <IconRotate
+                                            strokeWidth={"1.5"}
+                                            size={"20"}
+                                        />
+                                        {i18n.t("tour.reset")}
+                                    </button>
+                                </Menu.Item>
                                 <Menu.Item>
                                     <button
                                         onClick={logout}

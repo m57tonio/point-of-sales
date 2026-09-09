@@ -93,6 +93,7 @@ Route::post('/language/switch', [LanguageController::class, 'switch'])->name('la
 
 Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], function () {
     Route::post('/tours/{tour}/complete', [TourController::class, 'complete'])->name('tours.complete');
+    Route::post('/tours/reset', [TourController::class, 'reset'])->name('tours.reset');
     Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified', 'permission:dashboard-access'])->name('dashboard');
     Route::get('/permissions', [PermissionController::class, 'index'])->middleware('permission:permissions-access')->name('permissions.index');
     // roles route

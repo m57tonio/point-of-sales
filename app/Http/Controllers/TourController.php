@@ -25,4 +25,13 @@ class TourController extends Controller
 
         return response()->json(['completed' => $user->completed_tours]);
     }
+
+    public function reset(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+        $user->update(['completed_tours' => null]);
+
+        return response()->json(['completed' => []]);
+    }
 }
