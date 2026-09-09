@@ -31,9 +31,15 @@ export default function CustomerSelect({
     // Filter customers by search
     const filteredCustomers = customers.filter(
         (customer) =>
-            customer.name.toLowerCase().includes(search.toLowerCase()) ||
-            customer.no_telp?.toLowerCase().includes(search.toLowerCase()) ||
-            customer.member_code?.toLowerCase().includes(search.toLowerCase())
+            String(customer.name ?? "")
+                .toLowerCase()
+                .includes(search.toLowerCase()) ||
+            String(customer.no_telp ?? "")
+                .toLowerCase()
+                .includes(search.toLowerCase()) ||
+            String(customer.member_code ?? "")
+                .toLowerCase()
+                .includes(search.toLowerCase())
     );
 
     // Close on click outside
