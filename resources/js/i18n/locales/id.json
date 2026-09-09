@@ -90,6 +90,52 @@
             "next": "Selanjutnya"
         }
     },
+    "setup": {
+        "title": "Pengaturan Awal",
+        "subtitle": "Siapkan aplikasi kasir Anda dalam beberapa langkah",
+        "step": "Langkah {{current}} dari {{total}}",
+        "steps": {
+            "store": "Profil Toko",
+            "businessType": "Jenis Usaha",
+            "categories": "Kategori Produk",
+            "account": "Akun Admin & Gudang"
+        },
+        "store": {
+            "name": "Nama Toko",
+            "namePlaceholder": "Contoh: Toko Berkah Jaya",
+            "address": "Alamat",
+            "phone": "Telepon",
+            "email": "Email"
+        },
+        "businessType": {
+            "hint": "Pilih jenis usaha Anda — kami akan menyiapkan kategori produk yang sesuai",
+            "food": "Makanan & Minuman",
+            "retail": "Retail",
+            "grocery": "Grosir & Sembako",
+            "fashion": "Fashion",
+            "pharmacy": "Apotek",
+            "services": "Jasa"
+        },
+        "categories": {
+            "hint": "Pilih kategori yang sesuai, atau tambahkan sendiri",
+            "placeholder": "Tambah kategori lain...",
+            "add": "Tambah"
+        },
+        "account": {
+            "name": "Nama Lengkap",
+            "adminHint": "Akun ini menjadi Super Admin — digunakan untuk masuk pertama kali",
+            "warehouseCode": "Kode Gudang Utama",
+            "warehouseCodePlaceholder": "Contoh: PUSAT",
+            "warehouseName": "Nama Gudang Utama"
+        },
+        "password": "Kata Sandi",
+        "passwordHint": "Minimal 8 karakter",
+        "back": "Kembali",
+        "next": "Lanjut",
+        "finish": "Selesaikan Setup",
+        "completed": "Setup selesai! Silakan masuk dengan akun yang Anda buat.",
+        "required": "Bagian ini wajib diisi"
+    },
     "auth": {
         "login": {
             "title": "Masuk",

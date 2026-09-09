@@ -47,6 +47,7 @@ use App\Http\Controllers\Reports\AdvancedSalesInsightsController;
 use App\Http\Controllers\Reports\ProfitReportController;
 use App\Http\Controllers\Reports\SalesReportController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SetupController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -59,6 +60,12 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
+});
+
+// First-install setup wizard (locked out once app_setup_completed = true)
+Route::middleware('setup.notinstalled')->group(function () {
+    Route::get('/setup', [SetupController::class, 'index'])->name('setup.index');
+    Route::post('/setup', [SetupController::class, 'store'])->middleware('throttle:10,1')->name('setup.store');
 });
 
 // Public marketing pages (open source)

@@ -90,6 +90,52 @@
             "next": "Next"
         }
     },
+    "setup": {
+        "title": "Initial Setup",
+        "subtitle": "Set up your POS app in a few steps",
+        "step": "Step {{current}} of {{total}}",
+        "steps": {
+            "store": "Store Profile",
+            "businessType": "Business Type",
+            "categories": "Product Categories",
+            "account": "Admin Account & Warehouse"
+        },
+        "store": {
+            "name": "Store Name",
+            "namePlaceholder": "e.g. Berkah Jaya Store",
+            "address": "Address",
+            "phone": "Phone",
+            "email": "Email"
+        },
+        "businessType": {
+            "hint": "Choose your business type — we'll prepare matching product categories",
+            "food": "Food & Beverage",
+            "retail": "Retail",
+            "grocery": "Grocery & Wholesale",
+            "fashion": "Fashion",
+            "pharmacy": "Pharmacy",
+            "services": "Services"
+        },
+        "categories": {
+            "hint": "Select the categories that fit, or add your own",
+            "placeholder": "Add another category...",
+            "add": "Add"
+        },
+        "account": {
+            "name": "Full Name",
+            "adminHint": "This account becomes the Super Admin — used for your first sign in",
+            "warehouseCode": "Main Warehouse Code",
+            "warehouseCodePlaceholder": "e.g. PUSAT",
+            "warehouseName": "Main Warehouse Name"
+        },
+        "password": "Password",
+        "passwordHint": "At least 8 characters",
+        "back": "Back",
+        "next": "Next",
+        "finish": "Finish Setup",
+        "completed": "Setup complete! Sign in with the account you created.",
+        "required": "This section is required"
+    },
     "auth": {
         "login": {
             "title": "Sign In",

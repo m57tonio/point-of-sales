@@ -3,6 +3,7 @@
 use App\Http\Middleware\EnforceAbsoluteSessionLifetime;
 use App\Http\Middleware\EnsureActiveCashierShift;
 use App\Http\Middleware\EnsureBotGuard;
+use App\Http\Middleware\EnsureNotInstalled;
 use App\Http\Middleware\EnsurePublicRegistrationEnabled;
 use App\Http\Middleware\EnsureRecentPasswordConfirmation;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -48,6 +49,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'active_shift' => EnsureActiveCashierShift::class,
             'registration.enabled' => EnsurePublicRegistrationEnabled::class,
             'bot.guard' => EnsureBotGuard::class,
+            'setup.notinstalled' => EnsureNotInstalled::class,
             'step_up' => EnsureRecentPasswordConfirmation::class,
             'abilities' => CheckAbilities::class,
         ]);
