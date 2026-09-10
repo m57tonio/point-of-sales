@@ -78,6 +78,8 @@ export default function Index({
     const [redeemPointsInput, setRedeemPointsInput] = useState("");
     const [cashInput, setCashInput] = useState("");
     const [shippingInput, setShippingInput] = useState("");
+    const [orderType, setOrderType] = useState("in_store");
+    const [orderNote, setOrderNote] = useState("");
     const [paymentMethod, setPaymentMethod] = useState(
         defaultPaymentGateway ?? "cash"
     );
@@ -585,6 +587,8 @@ export default function Index({
                 pay_later: payLater,
                 due_date: payLater ? dueDate : null,
                 bank_account_id: isBankTransfer ? selectedBankAccount?.id : null,
+                order_type: orderType,
+                note: orderNote || null,
                 items: carts.map((item) => ({
                     product_id: item.product_id,
                     unit_id: item.unit?.id ?? item.unit_id ?? null,
@@ -618,6 +622,8 @@ export default function Index({
                     : null,
                 pay_later: payLater,
                 due_date: dueDate,
+                order_type: orderType,
+                note: orderNote || null,
             },
             {
                 onSuccess: () => {
@@ -631,6 +637,8 @@ export default function Index({
                     setPaymentMethod(defaultPaymentGateway ?? "cash");
                     setPayLater(false);
                     setDueDate("");
+                    setOrderType("in_store");
+                    setOrderNote("");
                     setIsSubmitting(false);
                     toast.success("Transaksi berhasil!");
                 },
@@ -1341,6 +1349,48 @@ export default function Index({
                                         className="w-full h-10 pl-10 pr-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
                                     />
                                 </div>
+                            </div>
+
+                            {/* Order Type */}
+                            <div>
+                                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
+                                    Tipe Pesanan
+                                </label>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {[
+                                        { value: "in_store", label: "Di Tempat" },
+                                        { value: "takeaway", label: "Bawa Pulang" },
+                                        { value: "delivery", label: "Diantar" },
+                                    ].map((type) => (
+                                        <button
+                                            key={type.value}
+                                            type="button"
+                                            onClick={() => setOrderType(type.value)}
+                                            className={`py-2 px-1 rounded-lg text-xs font-semibold transition-all ${
+                                                orderType === type.value
+                                                    ? "bg-primary-500 text-white"
+                                                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200"
+                                            }`}
+                                        >
+                                            {type.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Order Note */}
+                            <div>
+                                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
+                                    Catatan
+                                </label>
+                                <textarea
+                                    value={orderNote}
+                                    onChange={(e) => setOrderNote(e.target.value)}
+                                    rows={2}
+                                    maxLength={1000}
+                                    placeholder="Catatan pesanan (opsional)"
+                                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
+                                />
                             </div>
 
                             {/* Shipping Cost Input */}

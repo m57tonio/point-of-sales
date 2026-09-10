@@ -40,6 +40,8 @@ class Transaction extends Model
         'payment_reference',
         'payment_url',
         'qr_string',
+        'order_type',
+        'note',
         'bank_account_id',
         'tax_rate',
         'tax_total',

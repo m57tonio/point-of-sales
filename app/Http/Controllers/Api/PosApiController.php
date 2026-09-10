@@ -517,6 +517,8 @@ class PosApiController extends Controller
             'bank_account_id' => ['nullable', 'integer', 'exists:bank_accounts,id'],
             'due_date' => ['nullable', 'date', 'required_if:payment_method,pay_later'],
             'customer_npwp' => ['nullable', 'string', 'max:50'],
+            'order_type' => ['nullable', 'in:in_store,takeaway,delivery'],
+            'note' => ['nullable', 'string', 'max:1000'],
         ]);
 
         $isPayLater = $validated['payment_method'] === 'pay_later';
@@ -608,6 +610,8 @@ class PosApiController extends Controller
                     'payment_method' => $isPayLater ? 'pay_later' : ($paymentGateway ?: 'cash'),
                     'payment_status' => $isCashPayment ? 'paid' : ($isPayLater ? 'unpaid' : 'pending'),
                     'bank_account_id' => $paymentGateway === 'bank_transfer' ? ($validated['bank_account_id'] ?? null) : null,
+                    'order_type' => $validated['order_type'] ?? null,
+                    'note' => isset($validated['note']) ? trim($validated['note']) ?: null : null,
                     'tax_rate' => data_get($checkoutPreview, 'summary.tax_rate'),
                     'tax_total' => data_get($checkoutPreview, 'summary.tax_total', 0),
                     'customer_npwp' => $validated['customer_npwp'] ?? null,

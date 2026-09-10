@@ -30,6 +30,10 @@ class ThermalPrintService
         $lines[] = $this->left('Tgl: '.($transaction->created_at?->format('d/m/Y H:i') ?? ''), $maxWidth);
         $lines[] = $this->left('Kasir: '.($transaction->cashier?->name ?? '-'), $maxWidth);
         $lines[] = $this->left('Pelanggan: '.($transaction->customer?->name ?? 'Umum'), $maxWidth);
+        if ($transaction->order_type) {
+            $labels = ['in_store' => 'Di Tempat', 'takeaway' => 'Bawa Pulang', 'delivery' => 'Diantar'];
+            $lines[] = $this->left('Tipe: '.($labels[$transaction->order_type] ?? $transaction->order_type), $maxWidth);
+        }
         $lines[] = $this->line($maxWidth);
 
         foreach ($transaction->details as $detail) {
@@ -63,6 +67,11 @@ class ThermalPrintService
         }
 
         $lines[] = $this->line($maxWidth);
+        if ($transaction->note) {
+            foreach (explode("\n", wordwrap($transaction->note, $maxWidth, "\n", true)) as $noteLine) {
+                $lines[] = $this->left('Cat: '.$noteLine, $maxWidth);
+            }
+        }
         $lines[] = $this->center('Terima kasih', $maxWidth);
         $lines[] = $this->center('Barang yang sudah dibeli', $maxWidth);
         $lines[] = $this->center('tidak dapat ditukar/dikembalikan', $maxWidth);
