@@ -4,6 +4,7 @@ import DashboardLayout from "@/Layouts/DashboardLayout";
 import {
     IconArrowLeft,
     IconCashBanknote,
+    IconPrinter,
     IconReceipt,
     IconRotateClockwise2,
     IconWallet,
@@ -101,6 +102,24 @@ export default function Show({ cashierShift, canForceClose = false }) {
                             Dibuka {formatDateTime(cashierShift.opened_at)}
                         </p>
                     </div>
+                    {cashierShift.status !== "open" && (
+                        <button
+                            type="button"
+                            onClick={() =>
+                                window.open(
+                                    route("cashier-shifts.report", {
+                                        cashierShift: cashierShift.id,
+                                        type: "z",
+                                    }),
+                                    "_blank"
+                                )
+                            }
+                            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                        >
+                            <IconPrinter size={18} />
+                            <span>Cetak Laporan Z</span>
+                        </button>
+                    )}
                     <span
                         className={`inline-flex rounded-full px-3 py-1.5 text-sm font-semibold ${
                             cashierShift.status === "open"

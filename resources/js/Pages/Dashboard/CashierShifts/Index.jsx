@@ -9,6 +9,7 @@ import {
     IconClockHour4,
     IconEye,
     IconHistory,
+    IconPrinter,
     IconUser,
 } from "@tabler/icons-react";
 
@@ -40,6 +41,9 @@ export default function Index({
     const [openingCash, setOpeningCash] = useState("");
     const [notes, setNotes] = useState("");
     const [warehouseId, setWarehouseId] = useState(warehouses.length > 0 ? warehouses[0].id : "");
+    const [cashModal, setCashModal] = useState(null); // 'in' | 'out' | null
+    const [cashAmount, setCashAmount] = useState("");
+    const [cashNote, setCashNote] = useState("");
     const canOpenShift = can("cashier-shifts-open");
 
     const currentFilters = useMemo(
@@ -78,6 +82,26 @@ export default function Index({
         }
 
         router.post(route("cashier-shifts.store"), payload);
+    };
+
+    const handleCashMovement = (event) => {
+        event.preventDefault();
+
+        router.post(
+            route("cashier-shifts.cash-movements.store", activeShift.id),
+            {
+                type: cashModal,
+                amount: Number(cashAmount || 0),
+                note: cashNote,
+            },
+            {
+                onSuccess: () => {
+                    setCashModal(null);
+                    setCashAmount("");
+                    setCashNote("");
+                },
+            }
+        );
     };
 
     return (
@@ -223,6 +247,110 @@ export default function Index({
                                 {activeShift.transactions_count}
                             </p>
                         </div>
+                        <div className="flex items-center justify-end gap-2 md:col-span-4">
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    window.open(
+                                        route("cashier-shifts.report", {
+                                            cashierShift: activeShift.id,
+                                            type: "x",
+                                        }),
+                                        "_blank"
+                                    )
+                                }
+                                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                            >
+                                <IconPrinter size={18} />
+                                <span>Cetak Laporan X</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setCashModal("in")}
+                                className="inline-flex items-center gap-2 rounded-xl border border-emerald-200 px-4 py-2.5 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50 dark:border-emerald-900/50 dark:text-emerald-300 dark:hover:bg-emerald-950/30"
+                            >
+                                <IconCashBanknote size={18} />
+                                <span>Kas Masuk</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setCashModal("out")}
+                                className="inline-flex items-center gap-2 rounded-xl border border-rose-200 px-4 py-2.5 text-sm font-medium text-rose-700 transition-colors hover:bg-rose-50 dark:border-rose-900/50 dark:text-rose-300 dark:hover:bg-rose-950/30"
+                            >
+                                <IconCashBanknote size={18} />
+                                <span>Kas Keluar</span>
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {cashModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <div
+                            className="absolute inset-0 bg-slate-900/60"
+                            onClick={() => setCashModal(null)}
+                        />
+                        <form
+                            onSubmit={handleCashMovement}
+                            className="relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900"
+                        >
+                            <h3 className="text-lg font-bold text-slate-800 dark:text-white">
+                                {cashModal === "in" ? "Catat Kas Masuk" : "Catat Kas Keluar"}
+                            </h3>
+                            <div className="mt-4 space-y-3">
+                                <div>
+                                    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                                        Nominal
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={cashAmount}
+                                        onChange={(event) => setCashAmount(event.target.value)}
+                                        className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                                        placeholder="0"
+                                        required
+                                        autoFocus
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                                        Keterangan (opsional)
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={cashNote}
+                                        onChange={(event) => setCashNote(event.target.value)}
+                                        className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                                        placeholder={
+                                            cashModal === "in"
+                                                ? "Misal: setoran tambahan modal"
+                                                : "Misal: beli galon, kirim uang ke kasir pusat"
+                                        }
+                                        maxLength={255}
+                                    />
+                                </div>
+                            </div>
+                            <div className="mt-6 flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setCashModal(null)}
+                                    className="flex-1 rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                                >
+                                    Batal
+                                </button>
+                                <button
+                                    type="submit"
+                                    className={`flex-1 rounded-xl py-2.5 text-sm font-medium text-white transition-colors ${
+                                        cashModal === "in"
+                                            ? "bg-emerald-500 hover:bg-emerald-600"
+                                            : "bg-rose-500 hover:bg-rose-600"
+                                    }`}
+                                >
+                                    Simpan
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 )}
 

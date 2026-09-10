@@ -160,6 +160,8 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth', 'verified']], fu
     Route::post('cashier-shifts', [CashierShiftController::class, 'store'])->middleware('permission:cashier-shifts-open')->name('cashier-shifts.store');
     Route::get('cashier-shifts/{cashierShift}', [CashierShiftController::class, 'show'])->middleware('permission:cashier-shifts-access')->name('cashier-shifts.show');
     Route::post('cashier-shifts/{cashierShift}/close', [CashierShiftController::class, 'close'])->middleware('permission:cashier-shifts-close')->name('cashier-shifts.close');
+    Route::post('cashier-shifts/{cashierShift}/cash-movements', [CashierShiftController::class, 'storeCashMovement'])->middleware('permission:cashier-shifts-access')->name('cashier-shifts.cash-movements.store');
+    Route::get('cashier-shifts/{cashierShift}/report/{type}', [CashierShiftController::class, 'printReport'])->middleware('permission:cashier-shifts-access')->name('cashier-shifts.report');
     Route::resource('customers', CustomerController::class)
         ->middlewareFor(['index', 'show'], 'permission:customers-access')
         ->middlewareFor(['create', 'store'], 'permission:customers-create')

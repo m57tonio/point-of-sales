@@ -86,6 +86,11 @@ class CashierShift extends Model
         return $this->hasMany(SalesReturn::class);
     }
 
+    public function cashMovements()
+    {
+        return $this->hasMany(ShiftCashMovement::class, 'cashier_shift_id');
+    }
+
     public function scopeOpen($query)
     {
         return $query->where('status', self::STATUS_OPEN);

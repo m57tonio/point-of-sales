@@ -7,10 +7,12 @@ use App\Http\Requests\CloseCashierShiftRequest;
 use App\Http\Requests\ConfirmPasswordForForceCloseRequest;
 use App\Http\Requests\StoreCashierShiftRequest;
 use App\Models\CashierShift;
+use App\Models\ShiftCashMovement;
 use App\Models\User;
 use App\Models\Warehouse;
 use App\Services\AuditLogService;
 use App\Services\CashierShiftService;
+use App\Services\ThermalPrintService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -159,6 +161,43 @@ class CashierShiftController extends Controller
         return to_route('cashier-shifts.show', $closedShift)->with('success', 'Shift kasir berhasil ditutup.');
     }
 
+    public function storeCashMovement(Request $request, CashierShift $cashierShift): RedirectResponse
+    {
+        $cashierShift = $this->resolveVisibleShift($request, $cashierShift);
+
+        if ($cashierShift->user_id !== $request->user()->id && ! ($request->user()->isSuperAdmin() || $request->user()->can('cashier-shifts-force-close'))) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'type' => ['required', 'in:in,out'],
+            'amount' => ['required', 'integer', 'min:1'],
+            'note' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $this->cashierShiftService->recordCashMovement(
+            shift: $cashierShift,
+            actor: $request->user(),
+            type: $validated['type'],
+            amount: (int) $validated['amount'],
+            note: $validated['note'] ?? null,
+        );
+
+        return back()->with('success', 'Pergerakan kas berhasil dicatat.');
+    }
+
+    public function printReport(Request $request, CashierShift $cashierShift, string $type = 'X')
+    {
+        abort_unless(in_array(strtoupper($type), ['X', 'Z'], true), 404);
+
+        $cashierShift = $this->resolveVisibleShift($request, $cashierShift);
+
+        $service = app(ThermalPrintService::class);
+        $html = $service->generateShiftReportHtml($cashierShift, strtoupper($type));
+
+        return response($html)->header('Content-Type', 'text/html; charset=utf-8');
+    }
+
     private function resolveVisibleShift(Request $request, CashierShift $cashierShift): CashierShift
     {
         $query = CashierShift::query()
@@ -189,6 +228,22 @@ class CashierShiftController extends Controller
             'non_cash_sales_total' => $shift->isOpen() ? $summary['non_cash_sales_total'] : (int) $shift->non_cash_sales_total,
             'cash_refund_total' => $shift->isOpen() ? $summary['cash_refund_total'] : (int) $shift->cash_refund_total,
             'non_cash_refund_total' => $shift->isOpen() ? $summary['non_cash_refund_total'] : (int) $shift->non_cash_refund_total,
+            'cash_in_total' => $shift->isOpen() ? $summary['cash_in_total'] : ($summary['cash_in_total'] ?: 0),
+            'cash_out_total' => $shift->isOpen() ? $summary['cash_out_total'] : ($summary['cash_out_total'] ?: 0),
+            'cash_movements' => $shift->cashMovements()
+                ->with('user:id,name')
+                ->latest()
+                ->get()
+                ->map(fn (ShiftCashMovement $movement) => [
+                    'id' => $movement->id,
+                    'type' => $movement->type,
+                    'amount' => (int) $movement->amount,
+                    'note' => $movement->note,
+                    'user' => $movement->user?->name,
+                    'created_at' => optional($movement->created_at)?->toISOString(),
+                ])
+                ->values()
+                ->all(),
             'transactions_count' => $shift->isOpen() ? $summary['transactions_count'] : (int) $shift->transactions_count,
             'sales_returns_count' => $shift->isOpen() ? $summary['sales_returns_count'] : (int) $shift->sales_returns_count,
             'notes' => $shift->notes,

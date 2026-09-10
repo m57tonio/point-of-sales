@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\CashierShift;
 use App\Models\SalesReturn;
+use App\Models\ShiftCashMovement;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -97,17 +98,56 @@ class CashierShiftService
 
         $transactionsCount = (int) (clone $transactions)->count();
         $salesReturnsCount = (int) (clone $salesReturns)->count();
-        $expectedCash = (int) $shift->opening_cash + $cashSalesTotal - $cashRefundTotal;
+
+        $cashInTotal = (int) $shift->cashMovements()
+            ->where('type', ShiftCashMovement::TYPE_IN)
+            ->sum('amount');
+        $cashOutTotal = (int) $shift->cashMovements()
+            ->where('type', ShiftCashMovement::TYPE_OUT)
+            ->sum('amount');
+
+        $expectedCash = (int) $shift->opening_cash + $cashSalesTotal - $cashRefundTotal + $cashInTotal - $cashOutTotal;
 
         return [
             'cash_sales_total' => $cashSalesTotal,
             'non_cash_sales_total' => $nonCashSalesTotal,
             'cash_refund_total' => $cashRefundTotal,
             'non_cash_refund_total' => $nonCashRefundTotal,
+            'cash_in_total' => $cashInTotal,
+            'cash_out_total' => $cashOutTotal,
             'transactions_count' => $transactionsCount,
             'sales_returns_count' => $salesReturnsCount,
             'expected_cash' => $expectedCash,
         ];
+    }
+
+    public function recordCashMovement(CashierShift $shift, User $actor, string $type, int $amount, ?string $note = null): ShiftCashMovement
+    {
+        if (! $shift->isOpen()) {
+            throw ValidationException::withMessages([
+                'shift' => 'Shift sudah ditutup, tidak dapat mencatat pergerakan kas.',
+            ]);
+        }
+
+        if ($amount <= 0) {
+            throw ValidationException::withMessages([
+                'amount' => 'Nominal harus lebih besar dari nol.',
+            ]);
+        }
+
+        if (! in_array($type, [ShiftCashMovement::TYPE_IN, ShiftCashMovement::TYPE_OUT], true)) {
+            throw ValidationException::withMessages([
+                'type' => 'Tipe pergerakan kas tidak valid.',
+            ]);
+        }
+
+        return ShiftCashMovement::create([
+            'cashier_shift_id' => $shift->id,
+            'type' => $type,
+            'amount' => $amount,
+            'note' => $note,
+            'user_id' => $actor->id,
+        ]);
     }
 
     public function closeShift(
