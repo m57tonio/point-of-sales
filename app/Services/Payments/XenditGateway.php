@@ -10,24 +10,48 @@ class XenditGateway
 {
     public function createInvoice(Transaction $transaction, array $config): array
     {
+        return $this->createInvoiceRequest($transaction, $config);
+    }
+
+    /**
+     * Dynamic QRIS invoice — QRIS-only channel; returns qr_string.
+     */
+    public function createQrisInvoice(Transaction $transaction, array $config): array
+    {
+        $result = $this->createInvoiceRequest($transaction, $config, ['QRIS']);
+
+        return [
+            ...$result,
+            'qr_string' => $result['raw']['qr_string'] ?? null,
+        ];
+    }
+
+    private function createInvoiceRequest(Transaction $transaction, array $config, ?array $channels = null): array
+    {
         if (! ($config['enabled'] ?? false)) {
             throw new PaymentGatewayException('Xendit tidak aktif atau belum dikonfigurasi.');
         }
 
         $customer = $transaction->customer;
 
+        $payload = [
+            'external_id' => $transaction->invoice,
+            'amount' => (int) $transaction->grand_total,
+            'description' => 'Pembayaran transaksi #'.$transaction->invoice,
+            'customer' => [
+                'given_names' => optional($customer)->name ?? 'Customer',
+                'email' => optional($customer)->email ?? config('mail.from.address'),
+                'mobile_number' => optional($customer)->no_telp,
+            ],
+            'success_redirect_url' => route('transactions.print', $transaction->invoice),
+        ];
+
+        if ($channels !== null) {
+            $payload['channel_code'] = $channels;
+        }
+
         $response = Http::withBasicAuth($config['secret_key'], '')
-            ->post('https://api.xendit.co/v2/invoices', [
-                'external_id' => $transaction->invoice,
-                'amount' => (int) $transaction->grand_total,
-                'description' => 'Pembayaran transaksi #'.$transaction->invoice,
-                'customer' => [
-                    'given_names' => optional($customer)->name ?? 'Customer',
-                    'email' => optional($customer)->email ?? config('mail.from.address'),
-                    'mobile_number' => optional($customer)->no_telp,
-                ],
-                'success_redirect_url' => route('transactions.print', $transaction->invoice),
-            ]);
+            ->post('https://api.xendit.co/v2/invoices', $payload);
 
         if ($response->failed()) {
             throw new PaymentGatewayException(

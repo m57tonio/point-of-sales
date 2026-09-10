@@ -513,7 +513,7 @@ class PosApiController extends Controller
             'shipping_cost' => ['nullable', 'integer', 'min:0'],
             'redeem_points' => ['nullable', 'integer', 'min:0'],
             'cash' => ['nullable', 'numeric', 'min:0'],
-            'payment_method' => ['nullable', 'in:cash,bank_transfer,midtrans,xendit,pay_later'],
+            'payment_method' => ['nullable', 'in:cash,bank_transfer,midtrans,xendit,qris,pay_later'],
             'bank_account_id' => ['nullable', 'integer', 'exists:bank_accounts,id'],
             'due_date' => ['nullable', 'date', 'required_if:payment_method,pay_later'],
             'customer_npwp' => ['nullable', 'string', 'max:50'],
@@ -530,7 +530,12 @@ class PosApiController extends Controller
 
         if ($paymentGateway) {
             $paymentSetting = PaymentSetting::first();
-            if (! $paymentSetting || ! $paymentSetting->isGatewayReady($paymentGateway)) {
+            $gatewayReady = $paymentSetting && ($paymentGateway === 'qris'
+                ? $paymentSetting->isGatewayReady(PaymentSetting::GATEWAY_MIDTRANS)
+                    || $paymentSetting->isGatewayReady(PaymentSetting::GATEWAY_XENDIT)
+                : $paymentSetting->isGatewayReady($paymentGateway));
+
+            if (! $gatewayReady) {
                 return $this->error('Gateway pembayaran belum dikonfigurasi.', 422);
             }
         }
@@ -736,10 +741,17 @@ class PosApiController extends Controller
         // Payment gateway
         if ($paymentGateway) {
             try {
-                $paymentResponse = $paymentGatewayManager->createPayment($transaction, $paymentGateway, $paymentSetting);
+                $paymentResponse = $paymentGateway === 'qris'
+                    ? $paymentGatewayManager->createQrisPayment($transaction, $paymentSetting)
+                    : $paymentGatewayManager->createPayment($transaction, $paymentGateway, $paymentSetting);
+
                 $transaction->update([
+                    'payment_method' => $paymentGateway === 'qris'
+                        ? ($paymentResponse['raw']['payment_type'] ?? 'qris')
+                        : $paymentGateway,
                     'payment_reference' => $paymentResponse['reference'] ?? null,
                     'payment_url' => $paymentResponse['payment_url'] ?? null,
+                    'qr_string' => $paymentResponse['qr_string'] ?? null,
                 ]);
             } catch (\Throwable $e) {
                 // Gateway failure — transaction still valid, just no payment URL
@@ -747,8 +759,17 @@ class PosApiController extends Controller
             }
         }
 
+        $resource = new TransactionResource($transaction->load('details.product', 'customer', 'cashier', 'warehouse'));
+
+        if ($paymentGateway === 'qris') {
+            $data = $resource->toArray(request());
+            $data['payment_method'] = $transaction->payment_method;
+
+            return $this->created($data, 'Transaksi berhasil — scan QR untuk membayar');
+        }
+
         return $this->created(
-            new TransactionResource($transaction->load('details.product', 'customer', 'cashier', 'warehouse')),
+            $resource,
             'Transaksi berhasil'
         );
     }

@@ -21,4 +21,21 @@ class PaymentGatewayManager
             default => throw new PaymentGatewayException("Gateway {$gateway} belum didukung."),
         };
     }
+
+    /**
+     * Dynamic QRIS charge — uses whichever gateway is ready (midtrans
+     * preferred, xendit fallback). Returns reference/payment_url/qr_string.
+     */
+    public function createQrisPayment(Transaction $transaction, PaymentSetting $setting): array
+    {
+        if ($setting->isGatewayReady(PaymentSetting::GATEWAY_MIDTRANS)) {
+            return $this->midtransGateway->createQrisCharge($transaction, $setting->midtransConfig());
+        }
+
+        if ($setting->isGatewayReady(PaymentSetting::GATEWAY_XENDIT)) {
+            return $this->xenditGateway->createQrisInvoice($transaction, $setting->xenditConfig());
+        }
+
+        throw new PaymentGatewayException('Tidak ada gateway aktif untuk QRIS. Aktifkan Midtrans atau Xendit di pengaturan pembayaran.');
+    }
 }

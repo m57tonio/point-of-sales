@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class TransactionController extends Controller
 {
@@ -599,7 +600,12 @@ class TransactionController extends Controller
         if ($paymentGateway) {
             $paymentSetting = PaymentSetting::first();
 
-            if (! $paymentSetting || ! $paymentSetting->isGatewayReady($paymentGateway)) {
+            $gatewayReady = $paymentSetting && ($paymentGateway === 'qris'
+                ? $paymentSetting->isGatewayReady(PaymentSetting::GATEWAY_MIDTRANS)
+                    || $paymentSetting->isGatewayReady(PaymentSetting::GATEWAY_XENDIT)
+                : $paymentSetting->isGatewayReady($paymentGateway));
+
+            if (! $gatewayReady) {
                 return redirect()
                     ->route('transactions.index')
                     ->with('error', 'Gateway pembayaran belum dikonfigurasi.');
@@ -849,11 +855,14 @@ class TransactionController extends Controller
 
         if ($paymentGateway) {
             try {
-                $paymentResponse = $paymentGatewayManager->createPayment($transaction, $paymentGateway, $paymentSetting);
+                $paymentResponse = $paymentGateway === 'qris'
+                    ? $paymentGatewayManager->createQrisPayment($transaction, $paymentSetting)
+                    : $paymentGatewayManager->createPayment($transaction, $paymentGateway, $paymentSetting);
 
                 $transaction->update([
                     'payment_reference' => $paymentResponse['reference'] ?? null,
                     'payment_url' => $paymentResponse['payment_url'] ?? null,
+                    'qr_string' => $paymentResponse['qr_string'] ?? null,
                 ]);
             } catch (PaymentGatewayException $exception) {
                 return redirect()
@@ -875,6 +884,28 @@ class TransactionController extends Controller
         return Inertia::render('Dashboard/Transactions/Print', [
             'transaction' => $transaction,
         ]);
+    }
+
+    public function status($invoice)
+    {
+        $transaction = Transaction::where('invoice', $invoice)
+            ->firstOrFail(['payment_status']);
+
+        return response()->json([
+            'payment_status' => $transaction->payment_status,
+        ]);
+    }
+
+    public function qrisImage($invoice)
+    {
+        $transaction = Transaction::where('invoice', $invoice)
+            ->firstOrFail(['qr_string']);
+
+        abort_unless(filled($transaction->qr_string), 404);
+
+        $svg = QrCode::format('svg')->size(300)->margin(2)->generate($transaction->qr_string);
+
+        return response($svg, 200, ['Content-Type' => 'image/svg+xml']);
     }
 
     /**

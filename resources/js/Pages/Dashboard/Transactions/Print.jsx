@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Head, Link, router, usePage } from "@inertiajs/react";
 import {
     IconArrowLeft,
@@ -17,6 +17,7 @@ import ThermalReceipt, {
 } from "@/Components/Receipt/ThermalReceipt";
 import ShippingLabel from "@/Components/Receipt/ShippingLabel";
 import { useAuthorization } from "@/Utils/authorization";
+import toast from "react-hot-toast";
 
 export default function Print({ transaction }) {
     const { storeProfile } = usePage().props;
@@ -24,7 +25,37 @@ export default function Print({ transaction }) {
     const [printMode, setPrintMode] = useState("invoice"); // 'invoice' | 'thermal80' | 'thermal58'
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [isConfirming, setIsConfirming] = useState(false);
+    const [liveStatus, setLiveStatus] = useState(
+        transaction?.payment_status || "pending"
+    );
     const canConfirmPayment = can("transactions-confirm-payment");
+
+    const showQris =
+        Boolean(transaction?.qr_string) && liveStatus === "pending";
+
+    // Poll QRIS payment status every 4s while pending
+    useEffect(() => {
+        if (!showQris) return undefined;
+        const timer = setInterval(async () => {
+            try {
+                const res = await fetch(
+                    route("transactions.status", transaction.invoice),
+                    { headers: { Accept: "application/json" } }
+                );
+                const data = await res.json();
+                if (data.payment_status && data.payment_status !== liveStatus) {
+                    setLiveStatus(data.payment_status);
+                    if (data.payment_status === "paid") {
+                        toast.success("Pembayaran QRIS diterima!");
+                        router.reload({ only: ["transaction"] });
+                    }
+                }
+            } catch {
+                // ignore transient network errors
+            }
+        }, 4000);
+        return () => clearInterval(timer);
+    }, [showQris, transaction?.invoice, liveStatus]);
 
     const formatPrice = (price = 0) =>
         Number(price || 0).toLocaleString("id-ID", {
@@ -256,6 +287,23 @@ export default function Print({ transaction }) {
                                     <IconExternalLink size={18} />
                                     Pembayaran
                                 </a>
+                            )}
+
+                            {showQris && (
+                                <div className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-primary-200 dark:border-primary-800 bg-primary-50/60 dark:bg-primary-950/30 w-full sm:w-auto print:hidden">
+                                    <img
+                                        src={route("transactions.qr", transaction.invoice)}
+                                        alt="QRIS"
+                                        className="w-48 h-48 rounded-lg bg-white p-2"
+                                    />
+                                    <p className="text-xs font-semibold text-primary-700 dark:text-primary-300">
+                                        Scan QRIS untuk membayar
+                                    </p>
+                                    <span className="inline-flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
+                                        <span className="w-2 h-2 rounded-full bg-warning-500 animate-pulse" />
+                                        Menunggu pembayaran…
+                                    </span>
+                                </div>
                             )}
 
                             <button
