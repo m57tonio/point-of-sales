@@ -180,6 +180,16 @@ class HandleInertiaRequests extends Middleware
                 'website' => Setting::get('store_website', ''),
                 'city' => Setting::get('store_city', ''),
             ];
+
+            $printerSettings = [
+                'autoPrint' => Setting::getBool('printer_auto_print', false),
+                'paperSize' => Setting::get('printer_paper_size', '80mm'),
+            ];
+        } else {
+            $printerSettings = [
+                'autoPrint' => false,
+                'paperSize' => '80mm',
+            ];
         }
 
         return [
@@ -206,6 +216,7 @@ class HandleInertiaRequests extends Middleware
             'receivableAgingSummary' => $receivableAgingSummary,
             'activeCashierShift' => $activeCashierShift,
             'storeProfile' => $storeProfile,
+            'printerSettings' => $printerSettings,
             'pendingApprovalCount' => $pendingApprovalCount,
             'pendingDineOrdersCount' => $pendingDineOrdersCount,
             'appVersion' => config('app.version'),

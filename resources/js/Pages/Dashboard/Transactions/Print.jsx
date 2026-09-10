@@ -17,10 +17,11 @@ import ThermalReceipt, {
 } from "@/Components/Receipt/ThermalReceipt";
 import ShippingLabel from "@/Components/Receipt/ShippingLabel";
 import { useAuthorization } from "@/Utils/authorization";
+import { hasCachedPrinter, kickDrawer, printReceipt } from "@/Utils/escpos";
 import toast from "react-hot-toast";
 
 export default function Print({ transaction }) {
-    const { storeProfile } = usePage().props;
+    const { storeProfile, printerSettings } = usePage().props;
     const { can } = useAuthorization();
     const [printMode, setPrintMode] = useState("invoice"); // 'invoice' | 'thermal80' | 'thermal58'
     const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -151,6 +152,63 @@ export default function Print({ transaction }) {
 
     const isNonCash = paymentMethodKey !== "cash";
     const showPaymentLink = isNonCash && transaction.payment_url;
+
+    // ponytail: auto-print silently skips if no WebUSB printer is cached; browser print stays manual
+    useEffect(() => {
+        if (!printerSettings?.autoPrint) return;
+        if (!hasCachedPrinter()) return;
+        if (!transaction?.details?.length) return;
+        if (showQris) return; // wait for payment confirmation first
+        const orderTypeLabels = {
+            in_store: "Di Tempat",
+            takeaway: "Bawa Pulang",
+            delivery: "Diantar",
+        };
+        const discountTotal =
+            Number(transaction.discount || 0) +
+            promoDiscountTotal +
+            loyaltyDiscountTotal +
+            voucherDiscountTotal;
+        const data = {
+            store_name: store.name,
+            store_address: store.address,
+            store_phone: store.phone,
+            invoice: transaction.invoice,
+            created_at: formatDateTime(transaction.created_at),
+            cashier: transaction.cashier?.name,
+            customer_name: transaction.customer?.name,
+            order_type_label:
+                orderTypeLabels[transaction.order_type] ?? transaction.order_type,
+            items: items.map((item) => ({
+                qty: Number(item.qty),
+                name: item.product?.title ?? item.product?.name ?? "Item",
+                price: Number(item.price),
+            })),
+            money: formatPrice,
+            subtotal: baseSubtotal,
+            discount_total: discountTotal,
+            tax_total: Number(transaction.tax_total || 0),
+            shipping_cost: Number(transaction.shipping_cost || 0),
+            grand_total: Number(transaction.grand_total || 0),
+            payment_method_label: paymentMethodLabel,
+            cash_received: isNonCash ? null : Number(transaction.cash || 0),
+            change: Number(transaction.change || 0),
+            note: transaction.note,
+            footer: "Terima kasih!",
+        };
+        (async () => {
+            try {
+                await printReceipt(data, printerSettings.paperSize);
+                toast.success("Struk tercetak otomatis.");
+                if (!isNonCash) {
+                    await kickDrawer().catch(() => {});
+                }
+            } catch {
+                // printer busy/disconnected — manual print still available
+            }
+        })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [transaction?.id, printerSettings?.autoPrint]);
 
     const handlePrint = () => {
         window.print();
