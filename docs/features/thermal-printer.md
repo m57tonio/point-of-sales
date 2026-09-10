@@ -22,10 +22,16 @@ Cetak receipt ke printer thermal (ESC/POS protocol) langsung dari browser via We
 - Paper size: 80mm / 58mm
 - Auto-print toggle (cetak otomatis setelah transaksi)
 
-## ⚠️ Belum Tersedia (rencana Phase 5, lihat Planning POS Core Gaps)
+## ESC/POS WebUSB (Client-side)
 
-- **ESC/POS raw printing via WebUSB** — belum diimplementasikan. Tombol "Thermal" saat ini hanya fetch HTML receipt dan membukanya di tab browser untuk `window.print()`, BUKAN kirim byte ESC/POS ke printer.
-- **Auto-print setelah checkout** — setting toggle ada, tapi belum terintegrasi dengan checkout flow (kasir masih harus klik manual ke halaman print).
+Cetak langsung byte ESC/POS ke printer via WebUSB (tanpa dialog print browser):
+
+- Generator byte: `resources/js/Utils/escpos.js` — `buildReceiptBytes(data, paperSize)` (58mm/80mm, auto cut `GS V`), `drawerKickBytes(pin)` (ESC p untuk buka cash drawer)
+- Connector: `requestPrinter()` / `getPrinter()` / `printBytes()` — WebUSB, filter device printer class 7
+- Tombol di **Settings > Printer**: Hubungkan Printer, Test Print, Buka Laci (Kick), Putuskan
+- **Auto-print** setelah checkout non-QRIS (jika setting auto-print aktif + printer sudah terhubung + status bukan pending) + drawer kick otomatis untuk pembayaran tunai (`Print.jsx`)
+
+> **Catatan:** WebUSB hanya tersedia di browser Chromium (Chrome/Edge/Opera) dan butuh gesture pengguna (klik tombol "Hubungkan Printer"). Browser lain tetap bisa cetak via `window.print()`.
 
 ## Route
 
@@ -65,4 +71,4 @@ Kembali              11.150
 ## Catatan
 
 - Untuk print via jaringan: gunakan `NetworkPrintConnector` atau `WindowsPrintConnector` (belum ada di codebase)
-- ESC/POS WebUSB + auto-print: lihat planning "POS Core Gaps" Phase 5
+- Print shift X/Z report juga memakai ThermalPrintService (`generateShiftReportText`)

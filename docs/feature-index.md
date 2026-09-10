@@ -7,7 +7,7 @@
 | POS / Checkout | `docs/features/pos-transactions.md` | ✅ |
 | Sales Return | `docs/features/sales-returns.md` | ✅ |
 | Customer Portal (self-service) | `docs/features/customer-portal.md` | ✅ |
-| Offline Mode | — | ⚠️ Partial (queue belum sync balik) |
+| Offline Mode | — | ✅ (queue + auto-sync balik) |
 
 ## Inventory & Warehouse
 
@@ -81,8 +81,8 @@
 |-------|------|--------|
 | Import/Export CSV+Excel | `docs/features/import-export.md` | ✅ |
 | Mobile POS / PWA | `docs/features/mobile-pos.md` | ✅ |
-| Thermal Printer | `docs/features/thermal-printer.md` | ⚠️ Partial (ESC/POS & auto-print belum ada) |
-| Offline Mode | — | ⚠️ Partial (queue belum sync balik) |
+| Thermal Printer | `docs/features/thermal-printer.md` | ✅ (ESC/POS WebUSB + auto-print) |
+| Offline Mode | — | ✅ (queue + auto-sync balik) |
 | **WhatsApp Gateway** | `docs/features/whatsapp-gateway.md` | ✅ |
 
 ## App Versioning
