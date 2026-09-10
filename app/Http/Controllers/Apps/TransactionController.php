@@ -601,6 +601,13 @@ class TransactionController extends Controller
                 ->with('error', 'Tanggal jatuh tempo wajib diisi untuk nota barang.');
         }
 
+        // ponytail: piutang wajib punya customer; walk-in (null) sah untuk transaksi biasa
+        if ($isPayLater && ! $request->filled('customer_id')) {
+            return redirect()
+                ->route('transactions.index')
+                ->with('error', 'Nota barang memerlukan pelanggan.');
+        }
+
         if ($paymentGateway) {
             $paymentSetting = PaymentSetting::first();
 

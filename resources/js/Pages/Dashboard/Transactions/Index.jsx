@@ -549,8 +549,9 @@ export default function Index({
             return;
         }
 
-        if (!selectedCustomer?.id) {
-            toast.error("Pilih pelanggan terlebih dahulu");
+        // ponytail: walk-in tanpa pelanggan boleh; nota piutang wajib pelanggan (piutang butuh customer)
+        if (payLater && !selectedCustomer?.id) {
+            toast.error("Nota barang memerlukan pelanggan");
             return;
         }
 
@@ -576,7 +577,7 @@ export default function Index({
         if (!navigator.onLine) {
             const payload = {
                 client_uuid: crypto.randomUUID(),
-                customer_id: selectedCustomer.id,
+                customer_id: selectedCustomer?.id ?? null,
                 discount,
                 redeem_points: Number(redeemPointsInput || 0),
                 customer_voucher_id: selectedVoucherId || null,
@@ -608,7 +609,7 @@ export default function Index({
         router.post(
             route("transactions.store"),
             {
-                customer_id: selectedCustomer.id,
+                customer_id: selectedCustomer?.id ?? null,
                 discount,
                 redeem_points: Number(redeemPointsInput || 0),
                 customer_voucher_id: selectedVoucherId || null,

@@ -507,7 +507,12 @@ class PosApiController extends Controller
     public function checkout(Request $request, PaymentGatewayManager $paymentGatewayManager): JsonResponse
     {
         $validated = $request->validate([
-            'customer_id' => ['nullable', 'integer', 'exists:customers,id'],
+            'customer_id' => [
+                'nullable',
+                'integer',
+                'exists:customers,id',
+                'required_if:payment_method,pay_later',
+            ],
             'customer_voucher_id' => ['nullable', 'integer', 'exists:customer_vouchers,id'],
             'discount' => ['nullable', 'integer', 'min:0'],
             'shipping_cost' => ['nullable', 'integer', 'min:0'],
