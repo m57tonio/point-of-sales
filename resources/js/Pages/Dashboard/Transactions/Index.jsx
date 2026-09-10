@@ -20,7 +20,7 @@ import HeldTransactions, {
 import useBarcodeScanner from "@/Hooks/useBarcodeScanner";
 import { getProductImageUrl } from "@/Utils/imageUrl";
 import { useAuthorization } from "@/Utils/authorization";
-import { queueTransaction } from "@/Utils/offlineDb";
+import { queueTransaction, getPendingTransactions, getPendingCount, removePendingTransaction } from "@/Utils/offlineDb";
 import {
     IconUser,
     IconShoppingCart,
@@ -91,6 +91,7 @@ export default function Index({
     const [selectedVoucherId, setSelectedVoucherId] = useState("");
     const [openingCashInput, setOpeningCashInput] = useState("");
     const [shiftNotesInput, setShiftNotesInput] = useState("");
+    const [pendingSyncCount, setPendingSyncCount] = useState(0);
     const normalizedSelectedCategory =
         selectedCategory === null ? null : Number(selectedCategory);
     const pricingItemsByCartId = useMemo(() => {
@@ -396,6 +397,85 @@ export default function Index({
         );
     };
 
+    // Pending offline transactions
+    const refreshPendingCount = useCallback(async () => {
+        try {
+            setPendingSyncCount(await getPendingCount());
+        } catch {
+            // IndexedDB unavailable
+        }
+    }, []);
+
+    const flushPendingTransactions = useCallback(async () => {
+        if (!navigator.onLine) return;
+
+        const pending = await getPendingTransactions();
+        if (pending.length === 0) return;
+
+        const { data } = await axios.post(
+            "/api/v1/pos/transactions/sync",
+            {
+                transactions: pending.map((row) => ({
+                    ...row.data,
+                    queue_id: row.id,
+                })),
+            },
+            { headers: { Accept: "application/json" } }
+        );
+
+        const results = data?.data?.results || [];
+        let synced = 0;
+        let failed = 0;
+
+        for (let i = 0; i < results.length; i++) {
+            const result = results[i];
+            const row = pending[i];
+
+            if (
+                ["synced", "pending_approval", "duplicate"].includes(
+                    result.status
+                )
+            ) {
+                await removePendingTransaction(row.id);
+                synced++;
+            } else {
+                failed++;
+                toast.error(
+                    `Sync gagal: ${result.reason || "kesalahan tidak diketahui"}`
+                );
+            }
+        }
+
+        if (synced > 0) {
+            toast.success(
+                `${synced} transaksi offline tersinkronisasi. Page akan dimuat ulang.`,
+                { duration: 2500 }
+            );
+            router.reload({ only: ["carts", "carts_total"] });
+        }
+
+        await refreshPendingCount();
+    }, [refreshPendingCount]);
+
+    // Flush pending transactions on mount (if online)
+    useEffect(() => {
+        refreshPendingCount();
+
+        if (navigator.onLine) {
+            flushPendingTransactions().catch(() => {});
+        }
+    }, [refreshPendingCount, flushPendingTransactions]);
+
+    // Flush on reconnect
+    useEffect(() => {
+        const handleOnline = () => {
+            flushPendingTransactions().catch(() => {});
+        };
+
+        window.addEventListener("online", handleOnline);
+        return () => window.removeEventListener("online", handleOnline);
+    }, [flushPendingTransactions]);
+
     // Keyboard shortcuts
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -493,6 +573,7 @@ export default function Index({
 
         if (!navigator.onLine) {
             const payload = {
+                client_uuid: crypto.randomUUID(),
                 customer_id: selectedCustomer.id,
                 discount,
                 redeem_points: Number(redeemPointsInput || 0),
@@ -503,9 +584,15 @@ export default function Index({
                 payment_gateway: payLater ? null : isCashPayment ? null : paymentMethod,
                 pay_later: payLater,
                 due_date: payLater ? dueDate : null,
-                bank_account_id: isBankTransfer ? selectedBankAccount : null,
+                bank_account_id: isBankTransfer ? selectedBankAccount?.id : null,
+                items: carts.map((item) => ({
+                    product_id: item.product_id,
+                    unit_id: item.unit?.id ?? item.unit_id ?? null,
+                    qty: Number(item.qty),
+                })),
             };
             queueTransaction(payload).then(() => {
+                refreshPendingCount();
                 setCarts([]);
                 setPricingPreview(initialPricingPreview);
                 toast.success("Transaksi disimpan offline. Akan dikirim saat online.");

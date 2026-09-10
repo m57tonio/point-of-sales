@@ -20,15 +20,17 @@ import {
 import Notification from "@/Components/Dashboard/Notification";
 import { useTour } from "@/Hooks/useTour";
 import i18n from "@/i18n";
+import { getPendingCount } from "@/Utils/offlineDb";
 
 export default function POSLayout({ children }) {
     const { auth, storeProfile, activeCashierShift, appVersion } = usePage().props;
     const { darkMode, themeSwitcher } = useTheme();
     const { start: startTour, isActive: tourActive } = useTour("pos");
+    const [pendingSyncCount, setPendingSyncCount] = useState(0);
+    const isOnline = useOnlineStatus();
     const [currentTime, setCurrentTime] = useState(new Date());
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
-    const isOnline = useOnlineStatus();
 
     const toggleFullscreen = () => {
         if (!document.fullscreenElement) {
@@ -50,6 +52,23 @@ export default function POSLayout({ children }) {
             setCurrentTime(new Date());
         }, 60000);
         return () => clearInterval(timer);
+    }, []);
+
+    // Pending offline transaction count (refresh on mount and on reconnect)
+    useEffect(() => {
+        const refresh = () =>
+            getPendingCount()
+                .then(setPendingSyncCount)
+                .catch(() => {});
+
+        refresh();
+
+        window.addEventListener("online", refresh);
+        const timer = setInterval(refresh, 15000);
+        return () => {
+            window.removeEventListener("online", refresh);
+            clearInterval(timer);
+        };
     }, []);
 
     const formatTime = (date) => {
@@ -237,6 +256,12 @@ export default function POSLayout({ children }) {
             {!isOnline && (
                 <div className="bg-amber-500 text-white text-center text-xs font-medium py-1 px-4">
                     Transaksi disimpan offline — akan dikirim saat online kembali
+                </div>
+            )}
+
+            {isOnline && pendingSyncCount > 0 && (
+                <div className="bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 text-center text-xs font-medium py-1 px-4">
+                    {pendingSyncCount} transaksi menunggu sinkronisasi
                 </div>
             )}
 

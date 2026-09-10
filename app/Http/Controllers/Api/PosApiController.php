@@ -754,6 +754,165 @@ class PosApiController extends Controller
     }
 
     /**
+     * POST /api/v1/pos/transactions/sync
+     * Flush offline-queued transactions. Each item carries its own items[]
+     * because server-side carts do not exist while offline. Prices are
+     * revalidated server-side; the client grand_total is ignored.
+     */
+    public function syncTransactions(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'transactions' => ['required', 'array', 'max:50'],
+            'transactions.*.client_uuid' => ['required', 'uuid'],
+            'transactions.*.customer_id' => ['nullable', 'integer', 'exists:customers,id'],
+            'transactions.*.discount' => ['nullable', 'integer', 'min:0'],
+            'transactions.*.redeem_points' => ['nullable', 'integer', 'min:0'],
+            'transactions.*.cash' => ['nullable', 'numeric', 'min:0'],
+            'transactions.*.pay_later' => ['nullable', 'boolean'],
+            'transactions.*.due_date' => ['nullable', 'date'],
+            'transactions.*.items' => ['required', 'array', 'min:1'],
+            'transactions.*.items.*.product_id' => ['required', 'integer', 'exists:products,id'],
+            'transactions.*.items.*.qty' => ['required', 'numeric', 'min:0.01'],
+            'transactions.*.items.*.unit_id' => ['nullable', 'integer', 'exists:units,id'],
+        ]);
+
+        $results = [];
+
+        foreach ($validated['transactions'] as $index => $payload) {
+            $uuid = $payload['client_uuid'];
+
+            // Idempotency: already synced?
+            if ($existing = Transaction::where('client_uuid', $uuid)->first()) {
+                $results[] = [
+                    'client_uuid' => $uuid,
+                    'status' => 'duplicate',
+                    'transaction_id' => $existing->id,
+                    'invoice' => $existing->invoice,
+                ];
+
+                continue;
+            }
+
+            $response = $this->syncOne($request, $payload, $uuid);
+
+            $results[] = array_merge(['client_uuid' => $uuid], $response);
+        }
+
+        return $this->ok(['results' => $results]);
+    }
+
+    private function syncOne(Request $request, array $payload, string $uuid): array
+    {
+        $isPayLater = (bool) ($payload['pay_later'] ?? false);
+        $user = $request->user();
+
+        if (! $user) {
+            return ['status' => 'failed', 'reason' => 'Tidak terautentikasi.'];
+        }
+
+        // Rebuild cart rows from the offline items, then reuse the normal
+        // checkout flow so pricing/stock/loyalty logic has a single source.
+        try {
+            $shift = $this->cashierShiftService->getActiveShiftForUser($user->id);
+
+            if (! $shift) {
+                return ['status' => 'failed', 'reason' => 'Shift kasir belum dibuka. Transaksi offline tetap tersimpan di antrean.'];
+            }
+
+            $createdCartIds = [];
+
+            foreach ($payload['items'] as $item) {
+                $product = Product::find($item['product_id']);
+
+                if (! $product) {
+                    $this->deleteCarts($createdCartIds);
+
+                    return ['status' => 'failed', 'reason' => "Produk #{$item['product_id']} tidak ditemukan."];
+                }
+
+                if ($product->is_composite) {
+                    $product->load('components');
+                    $sellPrice = (int) $product->components->sum(fn ($c) => $c->sell_price * (float) $c->pivot->qty);
+                    $cart = Cart::create([
+                        'cashier_id' => $user->id,
+                        'warehouse_id' => $shift->warehouse_id,
+                        'product_id' => $product->id,
+                        'unit_id' => null,
+                        'conversion_factor' => 1,
+                        'qty' => $item['qty'],
+                        'price' => $sellPrice * $item['qty'],
+                    ]);
+                } else {
+                    $unitId = (int) ($item['unit_id'] ?? $product->baseUnit()?->id ?? 1);
+                    $pu = $product->units()->where('unit_id', $unitId)->first();
+                    $conversionFactor = $pu?->pivot->conversion_factor ?? 1;
+                    $sellPrice = $this->unitConversionService->getSellPrice($product, $unitId);
+
+                    $cart = Cart::create([
+                        'cashier_id' => $user->id,
+                        'warehouse_id' => $shift->warehouse_id,
+                        'product_id' => $product->id,
+                        'unit_id' => $unitId,
+                        'conversion_factor' => $conversionFactor,
+                        'qty' => $item['qty'],
+                        'price' => $sellPrice * $item['qty'],
+                    ]);
+                }
+
+                $createdCartIds[] = $cart->id;
+            }
+
+            // Reuse checkout() with a synthesized request.
+            $checkoutRequest = new Request(array_filter([
+                'customer_id' => $payload['customer_id'] ?? null,
+                'discount' => $payload['discount'] ?? 0,
+                'redeem_points' => $payload['redeem_points'] ?? 0,
+                'cash' => $payload['cash'] ?? null,
+                'payment_method' => $isPayLater ? 'pay_later' : 'cash',
+                'due_date' => $isPayLater ? ($payload['due_date'] ?? null) : null,
+                'client_uuid' => $uuid,
+            ]));
+
+            $checkoutRequest->setUserResolver(fn () => $user);
+
+            $response = $this->checkout($checkoutRequest, app(PaymentGatewayManager::class));
+
+            // checkout() succeeded (2xx) — carts were consumed by it.
+            $json = json_decode($response->getContent(), true);
+
+            if ($response->isSuccessful()) {
+                $transactionId = data_get($json, 'data.id');
+                if ($transactionId) {
+                    Transaction::whereKey($transactionId)->update(['client_uuid' => $uuid]);
+                }
+
+                return [
+                    'status' => $response->getStatusCode() === 202 ? 'pending_approval' : 'synced',
+                    'transaction_id' => $transactionId,
+                    'invoice' => data_get($json, 'data.invoice'),
+                    'grand_total' => (int) data_get($json, 'data.grand_total', 0),
+                ];
+            }
+
+            // Checkout failed — remove the carts we just created.
+            $this->deleteCarts($createdCartIds);
+
+            return ['status' => 'failed', 'reason' => data_get($json, 'message', 'Checkout gagal.')];
+        } catch (\Throwable $e) {
+            report($e);
+
+            return ['status' => 'failed', 'reason' => $e->getMessage()];
+        }
+    }
+
+    private function deleteCarts(array $ids): void
+    {
+        if ($ids !== []) {
+            Cart::whereIn('id', $ids)->delete();
+        }
+    }
+
+    /**
      * GET /api/v1/pos/transactions?page=&per_page=&date_from=&date_to=
      * Transaction history (this cashier, or all for super-admin).
      */

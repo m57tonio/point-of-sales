@@ -23,6 +23,7 @@ class Transaction extends Model
         'warehouse_id',
         'customer_id',
         'invoice',
+        'client_uuid',
         'cash',
         'change',
         'discount',

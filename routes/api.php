@@ -132,6 +132,7 @@ Route::prefix('v1')->group(function () {
 
             // Checkout & transactions
             Route::post('/checkout', [PosApiController::class, 'checkout'])->name('api.pos.checkout');
+            Route::post('/transactions/sync', [PosApiController::class, 'syncTransactions'])->name('api.pos.transactions.sync');
             Route::get('/transactions', [PosApiController::class, 'transactions'])->name('api.pos.transactions');
             Route::get('/transactions/{transaction}', [PosApiController::class, 'transactionDetail'])->name('api.pos.transactions.show');
         });
