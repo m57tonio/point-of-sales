@@ -3,6 +3,7 @@ import { Menu, Transition } from "@headlessui/react";
 import { usePage, router } from "@inertiajs/react";
 import { IconLogout, IconRotate } from "@tabler/icons-react";
 import { useForm } from "@inertiajs/react";
+import axios from "axios";
 import MenuLink from "@/Utils/Menu";
 import LinkItem from "./LinkItem";
 import LinkItemDropdown from "./LinkItemDropdown";
@@ -54,10 +55,10 @@ export default function AuthDropdown({ auth, isMobile }) {
     const resetTours = (e) => {
         e.preventDefault();
 
-        router.post(route("tours.reset"), {}, {
-            preserveScroll: true,
-            onSuccess: () => router.reload({ only: ["auth"] }),
-        });
+        // ponytail: plain axios — Inertia router rejects the JSON-only response
+        axios
+            .post(route("tours.reset"), {}, { headers: { Accept: "application/json" } })
+            .then(() => router.reload({ only: ["auth"] }));
     };
 
     const avatarUrl = auth.user.avatar;

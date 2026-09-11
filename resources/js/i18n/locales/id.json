@@ -867,14 +867,14 @@
             }
         },
         "pos": {
-            "search": {
-                "title": "Pencarian Produk",
-                "desc": "Cari produk by nama atau scan barcode langsung ke sini. Tekan / untuk fokus cepat."
-            },
-            "products": {
-                "title": "Daftar Produk",
-                "desc": "Klik produk untuk menambahkannya ke keranjang. Filter by kategori tersedia di atas."
-            },
+ "search": {
+  "title": "Pencarian Produk",
+  "desc": "Cari produk berdasarkan nama atau scan barcode langsung ke sini. Tekan / untuk fokus cepat."
+ },
+ "products": {
+  "title": "Daftar Produk",
+  "desc": "Klik produk untuk menambahkannya ke keranjang. Filter kategori tersedia di bagian atas."
+ },
             "customer": {
                 "title": "Pilih Pelanggan",
                 "desc": "Opsional — pilih pelanggan untuk poin loyalitas, voucher, dan pencatatan piutang."
@@ -897,10 +897,10 @@
                 "title": "Aksi Produk",
                 "desc": "Cetak barcode massal, ekspor/impor produk, dan tambah produk baru."
             },
-            "search": {
-                "title": "Pencarian",
-                "desc": "Cari produk by nama, SKU, atau barcode."
-            },
+ "search": {
+  "title": "Pencarian",
+  "desc": "Cari produk berdasarkan nama, SKU, atau barcode."
+ },
             "view": {
                 "title": "Mode Tampilan",
                 "desc": "Ganti antara tampilan grid dan tabel sesuai kenyamanan."
@@ -919,18 +919,18 @@
                 "title": "Buka Shift",
                 "desc": "Isi modal awal dan pilih gudang, lalu buka shift untuk mulai berjualan."
             },
-            "active": {
-                "title": "Ringkasan Shift Aktif",
-                "desc": "Modal awal, expected cash, dan jumlah transaksi berjalan."
-            },
-            "filters": {
-                "title": "Filter Histori",
-                "desc": "Filter histori shift by kasir, status, dan rentang tanggal."
-            },
-            "history": {
-                "title": "Histori Shift",
-                "desc": "Review shift yang sudah ditutup, termasuk selisih kas saat closing."
-            }
+ "active": {
+  "title": "Ringkasan Shift Aktif",
+  "desc": "Modal awal, kas yang diharapkan, dan jumlah transaksi berjalan."
+ },
+ "filters": {
+  "title": "Filter Histori",
+  "desc": "Filter histori shift berdasarkan kasir, status, dan rentang tanggal."
+ },
+ "history": {
+  "title": "Histori Shift",
+  "desc": "Tinjau shift yang sudah ditutup, termasuk selisih kas saat penutupan."
+ }
         },
         "reports": {
             "header": {
@@ -941,14 +941,14 @@
                 "title": "Kartu Ringkasan",
                 "desc": "Metrik utama periode terpilih — pendapatan, profit, dan lainnya."
             },
-            "filters": {
-                "title": "Filter Laporan",
-                "desc": "Persempit data by tanggal, invoice, kasir, atau pelanggan."
-            },
-            "table": {
-                "title": "Data Laporan",
-                "desc": "Detail per transaksi/breakdown. Navigasi halaman di bawah."
-            }
+ "filters": {
+  "title": "Filter Laporan",
+  "desc": "Persempit data berdasarkan tanggal, invoice, kasir, atau pelanggan."
+ },
+ "table": {
+  "title": "Data Laporan",
+  "desc": "Rincian per transaksi. Navigasi halaman tersedia di bawah."
+ }
         }
     },
     "setupChecklist": {

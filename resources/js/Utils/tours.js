@@ -11,23 +11,23 @@ export const dashboardTour = {
     },
     {
       element: "[data-tour='dashboard-stats']",
-      popover: { title: t("stats.title"), description: t("stats.desc") },
+      popover: { title: t("dashboard.stats.title"), description: t("dashboard.stats.desc") },
     },
     {
       element: "[data-tour='dashboard-chart']",
-      popover: { title: t("chart.title"), description: t("chart.desc") },
+      popover: { title: t("dashboard.chart.title"), description: t("dashboard.chart.desc") },
     },
     {
       element: "[data-tour='dashboard-widgets']",
-      popover: { title: t("widgets.title"), description: t("widgets.desc") },
+      popover: { title: t("dashboard.widgets.title"), description: t("dashboard.widgets.desc") },
     },
     {
       element: "[data-tour='dashboard-recent']",
-      popover: { title: t("recent.title"), description: t("recent.desc") },
+      popover: { title: t("dashboard.recent.title"), description: t("dashboard.recent.desc") },
     },
     {
       element: "[data-tour='dashboard-lowstock']",
-      popover: { title: t("lowstock.title"), description: t("lowstock.desc") },
+      popover: { title: t("dashboard.lowstock.title"), description: t("dashboard.lowstock.desc") },
     },
   ],
 };
