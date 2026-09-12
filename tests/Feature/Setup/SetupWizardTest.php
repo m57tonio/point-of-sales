@@ -36,11 +36,34 @@ class SetupWizardTest extends TestCase
         ];
     }
 
+    public function test_root_redirects_to_setup_before_install(): void
+    {
+        $this->get('/')->assertRedirect(route('setup.index'));
+    }
+
+    public function test_root_renders_welcome_after_install(): void
+    {
+        Setting::set('app_setup_completed', true);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page->component('Welcome'));
+    }
+
     public function test_setup_page_is_accessible_before_install(): void
     {
         $this->get(route('setup.index'))
             ->assertOk()
-            ->assertInertia(fn ($page) => $page->component('Setup/Wizard'));
+            ->assertInertia(fn ($page) => $page
+                ->component('Setup/Wizard')
+                ->where('businessTypes.0', [
+                    'key' => 'food',
+                    'categories' => ['food', 'beverages', 'snacks', 'coffeeTea'],
+                ])
+                ->where('businessTypes.5', [
+                    'key' => 'services',
+                    'categories' => ['services', 'products', 'packages'],
+                ]));
     }
 
     public function test_setup_page_redirects_after_install(): void

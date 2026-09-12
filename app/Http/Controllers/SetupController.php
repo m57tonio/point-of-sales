@@ -16,19 +16,19 @@ use Inertia\Response;
 class SetupController extends Controller
 {
     public const BUSINESS_TYPES = [
-        'food' => ['Makanan', 'Minuman', 'Snack', 'Kopi & Teh'],
-        'retail' => ['Umum', 'Elektronik', 'Perlengkapan Rumah', 'Kecantikan'],
-        'grocery' => ['Sembako', 'Sayur & Buah', 'Daging & Seafood', 'Snack'],
-        'fashion' => ['Pakaian', 'Sepatu', 'Tas', 'Aksesoris'],
-        'pharmacy' => ['Obat Bebas', 'Obat Resep', 'Vitamin', 'Alat Kesehatan'],
-        'services' => ['Layanan', 'Produk', 'Paket'],
+        'food' => ['food', 'beverages', 'snacks', 'coffeeTea'],
+        'retail' => ['general', 'electronics', 'homeSupplies', 'beauty'],
+        'grocery' => ['staples', 'produce', 'meatSeafood', 'snacks'],
+        'fashion' => ['clothing', 'shoes', 'bags', 'accessories'],
+        'pharmacy' => ['otcMedicine', 'prescriptionMedicine', 'vitamins', 'medicalSupplies'],
+        'services' => ['services', 'products', 'packages'],
     ];
 
     public function index(): Response
     {
         return Inertia::render('Setup/Wizard', [
             'businessTypes' => array_map(
-                fn (string $key, array $labels) => ['key' => $key, 'label' => __('setup.'.$key), 'categories' => $labels],
+                fn (string $key, array $categories) => ['key' => $key, 'categories' => $categories],
                 array_keys(self::BUSINESS_TYPES),
                 self::BUSINESS_TYPES,
             ),

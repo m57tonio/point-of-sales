@@ -20,12 +20,13 @@ Panduan ini membantu developer baru menjalankan aplikasi dari nol sampai bisa lo
 ```bash
 cp .env.example .env
 composer install
-npm install
+PUPPETEER_SKIP_DOWNLOAD=true npm install
 php artisan key:generate
 php artisan migrate --seed
 php artisan storage:link
-npm run dev
-php artisan serve
+# Start all local processes
+composer run dev
+# Open http://localhost:8000 after the server starts
 ```
 
 ## Urutan Bootstrapping yang Disarankan
@@ -33,24 +34,31 @@ php artisan serve
 1. isi konfigurasi database di `.env`
 2. jalankan `php artisan migrate --seed`
 3. jalankan `php artisan storage:link`
-4. jalankan frontend dengan `npm run dev`
-5. jalankan server aplikasi
-6. login menggunakan akun default
-
-## Default Login
-
-- Admin: `arya@gmail.com` / `password`
-- Kasir: `cashier@gmail.com` / `password`
+4. jalankan `composer run dev`
+5. buka `http://localhost:8000`; pada instalasi pertama aplikasi otomatis membuka wizard `/setup`
+6. selesaikan wizard untuk membuat akun admin, profil toko, kategori, dan gudang utama
+7. login menggunakan akun yang dibuat pada wizard setup
 
 ## Seed Data
 
-Seeder utama akan membuat:
+`DatabaseSeeder` hanya akan membuat:
 
 - permission
 - role
-- user default
 - payment setting awal
-- sample data operasional
+- pengaturan dine-in
+- warehouse utama `PUSAT`
+
+Tidak ada user default atau sample data pada seeder utama. Pada instalasi pertama, buka root aplikasi dan wizard `/setup` akan terbuka otomatis untuk membuat akun admin.
+
+Untuk data demo/test secara eksplisit:
+
+```bash
+php artisan db:seed --class=UserSeeder
+php artisan db:seed --class=SampleDataSeeder
+```
+
+`SampleDataSeeder` membutuhkan `UserSeeder` terlebih dahulu. Seeder tambahan untuk coverage operasional tersedia sebagai `OperationalCoreSeeder`, `FeatureCoverageSeeder`, dan `FeatureDemoSeeder`.
 
 Catatan penting:
 
