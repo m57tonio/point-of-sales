@@ -116,8 +116,8 @@ export default function Wizard({ businessTypes }) {
                           )
                         : category;
                 }),
-            }))
-            .post(route("setup.store"));
+            }));
+        post(route("setup.store"));
     };
 
     const selectedType = businessTypes?.find(
