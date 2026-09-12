@@ -13,7 +13,11 @@ Panduan ini membantu developer baru menjalankan aplikasi dari nol sampai bisa lo
 - Node.js 18+ + npm
 - MySQL / MariaDB
 - ekstensi PHP standar Laravel
-- Chrome/Chromium (untuk WhatsApp Gateway — opsional)
+ - Chrome/Chromium (untuk WhatsApp Gateway — opsional)
+
+ Untuk deployment production yang memakai automation, siapkan queue worker dan scheduler Laravel.
+ Jalankan `php artisan schedule:run` setiap menit. WhatsApp Gateway juga memerlukan service Node
+ terpisah dan process manager seperti PM2.
 
 ## Langkah Setup
 
@@ -85,4 +89,6 @@ Cek minimal:
 
 - gambar tidak tampil: jalankan `php artisan storage:link`
 - payment webhook tidak jalan: cek `APP_URL`
-- modul baru error 500: cek apakah migration fitur sudah dijalankan
+ - modul baru error 500: cek apakah migration fitur sudah dijalankan
+ - reminder, reorder, atau campaign tidak berjalan: cek queue worker dan `schedule:run`
+ - WhatsApp tidak terkirim: cek `WA_SERVICE_URL`, status device, `wa_enabled`, dan service Node
