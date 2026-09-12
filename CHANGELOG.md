@@ -3,6 +3,20 @@
 All notable application releases are listed here. Git tags using the same
 `vMAJOR.MINOR.PATCH` version are the authoritative release identifiers.
 
+## [v2.10.5] - 2026-09-12
+
+### Fixed
+
+- Fixed cashier shift closing to persist only columns present in the shift schema.
+- Added a full demo seeder that runs the required seeders in dependency order.
+- Ensured demo products are linked to the primary warehouse before stock transfers.
+
+### Improved
+
+- Improved transaction customer selection responsiveness and desktop overflow handling.
+- Reorganized order details and cash payment controls for faster checkout.
+- Added dynamic quick cash amounts, exact-payment action, and clearer change feedback.
+
 ## [v2.10.4] - 2026-09-12
 
 ### Fixed

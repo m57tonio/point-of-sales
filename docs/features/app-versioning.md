@@ -1,6 +1,6 @@
 # App Versioning
 
-Versi aplikasi mengikuti SemVer dengan prefix `v`, misalnya `v2.10.4`.
+Versi aplikasi mengikuti SemVer dengan prefix `v`, misalnya `v2.10.5`.
 
 ## Sumber Versi
 
@@ -18,4 +18,4 @@ Versi aplikasi mengikuti SemVer dengan prefix `v`, misalnya `v2.10.4`.
 5. Buat annotated Git tag dengan nilai yang sama.
 6. Pastikan `APP_VERSION` sama dengan latest Git tag.
 
-Rilis saat ini: `v2.10.4`.
+Rilis saat ini: `v2.10.5`.
