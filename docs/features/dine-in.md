@@ -85,7 +85,7 @@ Dikontrol via `Setting` table:
 |-----|---------|-----------|
 | `dine_in_enabled` | true | Fitur dine-in aktif |
 | `dine_in_self_order_enabled` | true | Pelanggan bisa pesan sendiri |
-| `dine_in_pay_online_enabled` | true | Pengaturan legacy; endpoint order saat ini hanya menerima `pay_at_counter` |
+| `dine_in_pay_online_enabled` | true | Pengaturan legacy; pembayaran online belum tersedia dan endpoint hanya menerima `pay_at_counter` |
 
 ## Routes
 
