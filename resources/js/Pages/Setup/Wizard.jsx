@@ -16,7 +16,7 @@ import {
 
 const STEPS = ["store", "businessType", "categories", "account"];
 
-export default function Wizard({ businessTypes }) {
+export default function Wizard({ businessTypes, primaryWarehouse }) {
     const { t, i18n } = useTranslation();
     const { props } = usePage();
     const [step, setStep] = useState(0);
@@ -53,8 +53,9 @@ export default function Wizard({ businessTypes }) {
             user_name: "",
             user_email: "",
             password: "",
-            warehouse_code: "PUSAT",
-            warehouse_name: "Gudang Utama",
+            warehouse_id: primaryWarehouse?.id ?? "",
+            warehouse_code: primaryWarehouse?.code ?? "",
+            warehouse_name: primaryWarehouse?.name ?? "",
         });
     const [customCategory, setCustomCategory] = useState("");
 
@@ -117,7 +118,7 @@ export default function Wizard({ businessTypes }) {
                         : category;
                 }),
             }));
-        post(route("setup.store"));
+        post(route("setup.store"), { forceFormData: true });
     };
 
     const selectedType = businessTypes?.find(
